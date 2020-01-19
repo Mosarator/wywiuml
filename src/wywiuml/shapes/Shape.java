@@ -28,8 +28,9 @@ public abstract class Shape {
 	protected ShapeType shapetype;
 	protected Dimension dim;
 	protected Point pos;
+	private boolean isHidden;
 	
-	public ShapeType getShapeType() {
+ 	public ShapeType getShapeType() {
 		return shapetype;
 	}
 	
@@ -49,6 +50,28 @@ public abstract class Shape {
 	
 	public abstract boolean readSaveState(Serializable saveState);
 	
+	public Dimension getDimension() {
+		return dim;
+	}
+	
+	public Point getPosition() {
+		return pos;
+	}
+	
+	public void setPosition(int posX, int posY) {
+		pos = new Point(posX,posY); 
+	}
+	
+	
+	public boolean isHidden() {
+		return isHidden;
+	}
+
+	public void setHidden(boolean isHidden) {
+		this.isHidden = isHidden;
+	}
+
+
 	@SuppressWarnings("serial")
 	public static class SaveState implements Serializable{
 		public ShapeType type;

@@ -61,7 +61,6 @@ public class Canvas extends JPanel {
 		setMouseMode(defaultMode);
 	}
 
-
 	@Override
 	public void paint(Graphics g) {
 		g.setColor(BACKGROUND);
@@ -69,7 +68,8 @@ public class Canvas extends JPanel {
 
 		// call the draw-method for every umlObject
 		for (Shape obj : shapes) {
-			obj.draw(g);
+			if (obj.isHidden() == false)
+				obj.draw(g);
 		}
 		// Draw Panels
 		for (Component comp : getComponents()) {
@@ -78,7 +78,6 @@ public class Canvas extends JPanel {
 		// Highlight current Mode
 		highlightMode(g);
 	}
-
 
 	public Shape addShape(Shape obj) {
 		shapes.add(obj);
@@ -89,7 +88,6 @@ public class Canvas extends JPanel {
 	public boolean getIsEditing() {
 		return isEditing;
 	}
-
 
 	public void setIsEditing(boolean b) {
 		isEditing = b;
@@ -110,7 +108,7 @@ public class Canvas extends JPanel {
 		}
 		return result;
 	}
- 
+
 	public Shape getShapeAt(Point p) {
 		for (Shape obj : shapes) {
 			if (obj.isInside(p))
@@ -155,7 +153,6 @@ public class Canvas extends JPanel {
 			}
 		}
 	}
-
 
 	public Canvas removeObject(Shape obj) {
 		shapes.remove(obj);

@@ -108,7 +108,8 @@ public class Parser {
         return methodList;
     }
 
-    public static void sort(ClassOrInterfaceDeclaration cid) {
+    @SuppressWarnings("rawtypes")
+	public static void sort(ClassOrInterfaceDeclaration cid) {
         cid.getMembers().sort(new Comparator<BodyDeclaration>() {
             @Override
             public int compare(BodyDeclaration o1, BodyDeclaration o2) {

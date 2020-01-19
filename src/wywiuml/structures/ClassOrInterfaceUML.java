@@ -44,9 +44,10 @@ public class ClassOrInterfaceUML {
 	ClassOrInterfaceDeclaration classInfo;
 	//List<UMLLine> umlLines = new ArrayList<UMLLine>();
 
-	// TODO
 	public static ClassOrInterfaceUML fromDeclaration(ClassOrInterfaceDeclaration cid) {
-		return null;
+		ClassOrInterfaceUML info = new ClassOrInterfaceUML();
+		info.classInfo = cid;
+		return info;
 	}
 
 	public static ClassOrInterfaceUML quickCreate(String parseString) throws RegExException {
@@ -294,7 +295,6 @@ public class ClassOrInterfaceUML {
 		if (classInfo.isInterface() == false)
 			classInfo.setExtendedTypes(new NodeList<ClassOrInterfaceType>());
 		classInfo.addExtendedType(new ClassOrInterfaceType(null, umlclass.classInfo.getNameAsString()));
-
 	}
 
 	public String getSignature() {

@@ -21,7 +21,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.plaf.DimensionUIResource;
 
 import wywiuml.gui.Canvas;
 import wywiuml.structures.ClassOrInterfaceUML;
@@ -31,7 +30,7 @@ public class ClassObject extends Shape {
 	/**
 	 * Default Values
 	 */
-	private static final Dimension DIMENSION = new Dimension(100, 140);
+	private static final Dimension DIMENSION = new Dimension(80, 50);
 	private static final int linespacing = 5;
 	private static final int topspacing = 5;
 	private static final int leftspacing = 10;
@@ -50,12 +49,16 @@ public class ClassObject extends Shape {
 	private List<String> uncompiledAttributes = new ArrayList<String>();
 	private List<String> uncompiledMethods = new ArrayList<String>();
 	private List<AnchorPoint> anchors = new ArrayList<AnchorPoint>();
-	// TODO nur füer testzwecke
-	Serializable safeState;
+	
 
-	public static ClassObject fromUMLInfo() {
+	public static ClassObject fromUMLInfo(ClassOrInterfaceUML info) {
 		// TODO: fromCode
-		return null;
+		ClassObject obj = new ClassObject(0,0);
+		obj.umlInfo = info;
+		obj.isInterface = info.isInterface();
+		obj.isAbstract = info.isAbstract();
+		obj.recalculateSize(Canvas.getInstance().getFontMetrics(BASICFONT));
+		return obj;
 	}
 
 	public ClassObject() {
@@ -329,22 +332,24 @@ public class ClassObject extends Shape {
 			}) {
 			});
 
-			add(new JMenuItem(new AbstractAction("Safe") {
+			add(new JMenuItem(new AbstractAction("Verstecken") {
 				public void actionPerformed(ActionEvent e) {
-					umlclass.safeState = umlclass.getSaveState();
+					umlclass.setHidden(true);
 					canvas.repaint();
 				}
 			}) {
 			});
-
-			add(new JMenuItem(new AbstractAction("Load") {
+			
+			add(new JMenuItem(new AbstractAction("Löschen") {
 				public void actionPerformed(ActionEvent e) {
-					umlclass.readSaveState(umlclass.safeState);
-					umlclass.update();
+					Canvas.getInstance().removeObject(umlclass);
+					ClassOrInterfaceUML.removeFromList(umlclass.umlInfo);
+					//TODO Anchorpoints and lines
 					canvas.repaint();
 				}
 			}) {
 			});
+			
 		}
 
 	}
