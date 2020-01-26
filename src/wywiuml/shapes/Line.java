@@ -5,6 +5,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import wywiuml.gui.Canvas;
+
 
 public abstract class Line extends Shape {
 
@@ -20,7 +22,27 @@ public abstract class Line extends Shape {
 		}
 	}
 
-
+	@Override
+	public void delete(Shape source) {
+		System.out.println("delete line");
+		if(source == null) {
+			//TODO
+			return;
+		}
+		
+		if(source.getShapeType() == ShapeType.ANCHOR) {
+			Canvas.getInstance().removeShape(this);
+			if(source != startPoint)
+				startPoint.delete(this);
+			if(source != endPoint)
+				endPoint.delete(this);
+			// TODO
+			return;
+		}
+		super.delete(source);
+	}
+	
+	
 	public class LineSegment {
 		private AnchorPoint start;
 		private AnchorPoint end;

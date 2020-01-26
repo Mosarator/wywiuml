@@ -20,6 +20,8 @@ import wywiuml.shapes.ClassObject;
 import wywiuml.shapes.Generalization;
 import wywiuml.shapes.Shape;
 import wywiuml.shapes.Shape.SaveState;
+import wywiuml.shapes.Shape.ShapeType;
+import wywiuml.structures.ClassOrInterfaceUML;
 
 @SuppressWarnings("serial")
 public class Canvas extends JPanel {
@@ -85,6 +87,19 @@ public class Canvas extends JPanel {
 		return obj;
 	}
 
+	public void removeShape(Shape obj) {
+		shapes.remove(obj);
+	}
+	
+	public void clean() {
+		for(Shape s : shapes) {
+			if(s.getShapeType() == ShapeType.CLASS) {
+				ClassOrInterfaceUML.removeFromList( ((ClassObject) s).getUMLInfo());
+			}
+		}
+		shapes.clear();
+	}
+	
 	public boolean getIsEditing() {
 		return isEditing;
 	}

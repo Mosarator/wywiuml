@@ -216,6 +216,10 @@ public class ClassObject extends Shape {
 		}
 	}
 
+	public ClassOrInterfaceUML getUMLInfo() {
+		return umlInfo;
+	}
+	
 	private void setDefaultUmlInfo() {
 		int number = 0;
 		String className = null;
@@ -307,9 +311,72 @@ public class ClassObject extends Shape {
 		this.isAbstract = isAbstract;
 	}
 
+	@Override
+	public SaveState getSaveState() {
+		return new ClassSaveState(this);
+	}
+
+	@Override
+	public boolean readSaveState(Serializable saveState) {
+		
+		ClassSaveState ss = (ClassSaveState) saveState;
+		
+		pos.x = ss.posx;
+		pos.y = ss.posy;
+		dim.height = ss.height;
+		dim.width = ss.width;
+		isAbstract = ss.isAbstract;
+		isInterface = ss.isInterface;
+		ClassOrInterfaceUML newInfo;
+		
+		try {
+			uncompiledSignature = "";
+			newInfo = ClassOrInterfaceUML.quickCreate(ss.signature);
+		} catch (Exception error) {
+			newInfo = ClassOrInterfaceUML.quickCreate("+ ErrorClass");
+			uncompiledSignature = ss.signature;
+		}
+
+		uncompiledAttributes.clear();
+		for (String att : ss.attributes) {
+			try {
+				newInfo.addAttributeFromUMLString(att);
+			} catch (Exception error) {
+				if (!att.trim().isEmpty())
+					uncompiledAttributes.add(att);
+			}
+		}
+		uncompiledAttributes.clear();
+		for (String meth : ss.methods) {
+			try {
+				newInfo.addMethodFromUMLString(meth);
+			} catch (Exception error) {
+				System.out.println("ERROR: " + error.getMessage());
+				if (!meth.trim().isEmpty())
+					uncompiledMethods.add(meth);
+			}
+		}
+		ClassOrInterfaceUML.removeFromList(umlInfo);
+		umlInfo = newInfo;
+		return false;
+	}
+
+	@Override
+	public void delete(Shape source) {
+		System.out.println("delete class");
+		// Deletion starts from here
+		if(source == null) {
+			Canvas.getInstance().removeShape(this);
+			ClassOrInterfaceUML.removeFromList(umlInfo);
+			for(AnchorPoint a : anchors) {
+				a.delete(this);
+			}
+		}
+		super.delete(source);
+	}
+	
 	@SuppressWarnings("serial")
 	private static class PopupMenu extends JPopupMenu {
-
 		// Constructor
 		public PopupMenu(ClassObject umlclass) {
 			Canvas canvas = Canvas.getInstance();
@@ -340,10 +407,11 @@ public class ClassObject extends Shape {
 			}) {
 			});
 			
-			add(new JMenuItem(new AbstractAction("Löschen") {
+			add(new JMenuItem(new AbstractAction("Lï¿½schen") {
 				public void actionPerformed(ActionEvent e) {
-					Canvas.getInstance().removeObject(umlclass);
-					ClassOrInterfaceUML.removeFromList(umlclass.umlInfo);
+					//Canvas.getInstance().removeObject(umlclass);
+					//ClassOrInterfaceUML.removeFromList(umlclass.umlInfo);
+					umlclass.delete(null);
 					//TODO Anchorpoints and lines
 					canvas.repaint();
 				}
@@ -533,56 +601,6 @@ public class ClassObject extends Shape {
 			width = obj.dim.width;
 			height = obj.dim.height;
 		}
-	}
-
-	@Override
-	public SaveState getSaveState() {
-		return new ClassSaveState(this);
-	}
-
-	@Override
-	public boolean readSaveState(Serializable saveState) {
-		
-		ClassSaveState ss = (ClassSaveState) saveState;
-		
-		pos.x = ss.posx;
-		pos.y = ss.posy;
-		dim.height = ss.height;
-		dim.width = ss.width;
-		isAbstract = ss.isAbstract;
-		isInterface = ss.isInterface;
-		ClassOrInterfaceUML newInfo;
-		
-		try {
-			uncompiledSignature = "";
-			newInfo = ClassOrInterfaceUML.quickCreate(ss.signature);
-		} catch (Exception error) {
-			newInfo = ClassOrInterfaceUML.quickCreate("+ ErrorClass");
-			uncompiledSignature = ss.signature;
-		}
-
-		uncompiledAttributes.clear();
-		for (String att : ss.attributes) {
-			try {
-				newInfo.addAttributeFromUMLString(att);
-			} catch (Exception error) {
-				if (!att.trim().isEmpty())
-					uncompiledAttributes.add(att);
-			}
-		}
-		uncompiledAttributes.clear();
-		for (String meth : ss.methods) {
-			try {
-				newInfo.addMethodFromUMLString(meth);
-			} catch (Exception error) {
-				System.out.println("ERROR: " + error.getMessage());
-				if (!meth.trim().isEmpty())
-					uncompiledMethods.add(meth);
-			}
-		}
-		ClassOrInterfaceUML.removeFromList(umlInfo);
-		umlInfo = newInfo;
-		return false;
 	}
 
 }

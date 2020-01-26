@@ -62,6 +62,9 @@ public abstract class Shape {
 		pos = new Point(posX,posY); 
 	}
 	
+	public void delete(Shape source) {
+		
+	};
 	
 	public boolean isHidden() {
 		return isHidden;

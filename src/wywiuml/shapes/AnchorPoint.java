@@ -13,7 +13,6 @@ public class AnchorPoint extends Shape {
 	
 	private static final Color CLR = Color.BLACK;
 	
-	//private Point pos;
 	private final int size = 6;
 	private final int tolerance = 10;
 	private Shape connectedShape;
@@ -35,6 +34,24 @@ public class AnchorPoint extends Shape {
 		g.fillRect(pos.x - size / 2, pos.y - size / 2, size, size);
 	}
 
+	@Override
+	public void delete(Shape source) {
+		System.out.println("delete Anchor");
+		if(source == null) {
+			//TODO
+			return;
+		}
+		if(source.getShapeType() == ShapeType.CLASS) {
+			connectedShape = null;
+			line.delete(this);
+			Canvas.getInstance().removeShape(this);
+			return;
+		}
+		// Default: Source is Line (check for it?)
+		connectedShape.delete(this);
+		Canvas.getInstance().removeShape(this);
+	}
+	
 	@Override
 	public boolean isInside(Point p) {
 		if (p.x > pos.x - size / 2 - tolerance && p.x < pos.x + size / 2 + tolerance
