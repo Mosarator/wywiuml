@@ -14,7 +14,7 @@ import wywiuml.shapes.Line.LineSegment;
 import wywiuml.shapes.Line.Vector2D;
 import wywiuml.shapes.Shape.ShapeType;
 
-public class Association extends Line{
+public class Association extends Line {
 	private boolean isCompleted;
 	private boolean isCorrect;
 	private static final Color CLR_LINE = Color.BLACK;
@@ -22,51 +22,35 @@ public class Association extends Line{
 
 	private static final int ARROWWIDTH = 10;
 	private static final int ARROWHEIGHT = 10;
-	private Point startP, endP;
-	private AnchorPoint start, end;
 	
 	public Association() {
 		this(false);
 	}
-	
+
 	public Association(boolean completed) {
-		this(completed,new Point(0,0),new Point(0,0));
+		this(completed, new Point(0, 0), new Point(0, 0));
 	}
-	
-	public Association(boolean completed, Point startPoint, Point endPoint) {
-		startP = startPoint.getLocation();
-		endP = endPoint.getLocation();
+
+	public Association(boolean completed, Point start, Point end) {
+		startP = start.getLocation();
+		endP = end.getLocation();
 		isCompleted = completed;
 		if (completed) {
-			complete(Canvas.getInstance().getShapeAt(startPoint), Canvas.getInstance().getShapeAt(endPoint));
+			complete(Canvas.getInstance().getShapeAt(start), Canvas.getInstance().getShapeAt(end));
 		} else {
 			// Default berhaviour;
 			shapetype = ShapeType.GENERALIZATION;
 		}
 	}
-	
-	public boolean complete(Shape fromShape, Shape toShape) {
-		if (fromShape == null || toShape == null || fromShape.shapetype != ShapeType.CLASS
-				|| toShape.shapetype != ShapeType.CLASS)
-			return false; 
 
+	public boolean complete(Shape fromShape, Shape toShape) {
+		if (super.complete(fromShape, toShape) == false) {
+			return false;
+		}
+		isCorrect = true;
 		ClassObject from = (ClassObject) fromShape;
 		ClassObject to = (ClassObject) toShape;
 
-		isCompleted = true;
-		start = new AnchorPoint(startP);
-		end = new AnchorPoint(endP);
-
-		start.setConnectedShape(from);
-		start.setLine(this);
-		end.setConnectedShape(to);
-		end.setLine(this);
-
-		segments = new ArrayList<Line.LineSegment>();
-		segments.add(new LineSegment(start, end));
-		from.addAnchor(start);
-		to.addAnchor(end);
-		isCorrect = true;
 		if (from.isInterface() == to.isInterface()) {
 			shapetype = ShapeType.GENERALIZATION;
 		} else {
@@ -78,12 +62,6 @@ public class Association extends Line{
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public boolean isInside(Point p) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override
@@ -150,13 +128,13 @@ public class Association extends Line{
 	@Override
 	public void update() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void update(boolean recursive) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

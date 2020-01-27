@@ -99,6 +99,10 @@ public class ClassObject extends Shape {
 
 	}
 
+	public void removeAnchor(AnchorPoint a) {
+		anchors.remove(a);
+	}
+	
 	@Override
 	public void draw(Graphics g) {
 
@@ -409,10 +413,7 @@ public class ClassObject extends Shape {
 			
 			add(new JMenuItem(new AbstractAction("L�schen") {
 				public void actionPerformed(ActionEvent e) {
-					//Canvas.getInstance().removeObject(umlclass);
-					//ClassOrInterfaceUML.removeFromList(umlclass.umlInfo);
 					umlclass.delete(null);
-					//TODO Anchorpoints and lines
 					canvas.repaint();
 				}
 			}) {
@@ -435,7 +436,6 @@ public class ClassObject extends Shape {
 
 		private EditWindow(ClassObject obj) {
 			super();
-
 			// "Konstanten"
 			Color bg = Color.BLACK;
 			List<String> attributes = new ArrayList<String>();
@@ -499,7 +499,6 @@ public class ClassObject extends Shape {
 						newInfo = ClassOrInterfaceUML.quickCreate("+ ErrorClass");
 						obj.uncompiledSignature = nameField.getText();
 					}
-
 					List<String> uncompiledAttributes = new ArrayList<String>();
 					String[] lines = attArea.getText().split("\r?\n");
 					for (String line : lines) {

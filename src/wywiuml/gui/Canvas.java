@@ -113,6 +113,7 @@ public class Canvas extends JPanel {
 			removeAll();
 			isEditing = false;
 			repaint();
+			setMouseMode(defaultMode);
 		}
 	}
 

@@ -35,8 +35,7 @@ public class Toolbar extends JPanel {
 		
 		ToolButton generalizationButton = new ToolButton(new ImageIcon("img/general.png"),new CreateGeneralizationMode());
 		add(generalizationButton);
-		//this.add(new ToolButton(new ImageIcon("img/select.png"),new SelectAndEditMode()));
-		
+
 		ToolButton associationButton = new ToolButton(new ImageIcon("img/associate.png"), new CreateAssociationMode());
 		add(associationButton);
 		
@@ -54,19 +53,23 @@ public class Toolbar extends JPanel {
 		private ToolButton(ImageIcon icon, MouseMode pMode) {
 			mode = pMode;
 			setIcon(icon);
-			setBackground(Color.BLUE);
+			setBackground(Color.BLACK);
 			setPreferredSize(new Dimension(20,20));
 			Canvas canvas = Canvas.getInstance();
-			
 			
 			addActionListener(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					setBackground(Color.BLUE);
 					canvas.setMouseMode(mode);
 					canvas.cancelEditing();
 					canvas.repaint();
 				}
 			});
+		}
+		
+		private void resetColor() {
+			setBackground(Color.BLACK);
 		}
 	}
 }

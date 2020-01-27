@@ -48,6 +48,9 @@ public class AnchorPoint extends Shape {
 			return;
 		}
 		// Default: Source is Line (check for it?)
+		if(connectedShape.getShapeType() == ShapeType.CLASS) {
+			((ClassObject)connectedShape).removeAnchor(this);
+		}
 		connectedShape.delete(this);
 		Canvas.getInstance().removeShape(this);
 	}

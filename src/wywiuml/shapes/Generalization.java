@@ -4,9 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import wywiuml.gui.Canvas;
@@ -19,8 +22,8 @@ public class Generalization extends Line {
 
 	private static final int ARROWWIDTH = 10;
 	private static final int ARROWHEIGHT = 10;
-	private Point startP, endP;
-	private AnchorPoint start, end;
+	//private Point startP, endP;
+	//private AnchorPoint start, end;
 
 	public Generalization() {
 		this(false);
@@ -30,12 +33,12 @@ public class Generalization extends Line {
 		this(completed, new Point(0, 0), new Point(0, 0));
 	}
 
-	public Generalization(boolean completed, Point startPoint, Point endPoint) {
-		startP = startPoint.getLocation();
-		endP = endPoint.getLocation();
+	public Generalization(boolean completed, Point start, Point end) {
+		startP = start.getLocation();
+		endP = end.getLocation();
 		isCompleted = completed;
 		if (completed) {
-			complete(Canvas.getInstance().getShapeAt(startPoint), Canvas.getInstance().getShapeAt(endPoint));
+			complete(Canvas.getInstance().getShapeAt(start), Canvas.getInstance().getShapeAt(end));
 		} else {
 			// Default behaviour;
 			shapetype = ShapeType.GENERALIZATION;
@@ -43,27 +46,12 @@ public class Generalization extends Line {
 	}
 
 	public boolean complete(Shape fromShape, Shape toShape) {
-		if (fromShape == null || toShape == null || fromShape.shapetype != ShapeType.CLASS
-				|| toShape.shapetype != ShapeType.CLASS)
+		if(super.complete(fromShape, toShape)== false) {
 			return false;
-
+		}
+		isCorrect = true;
 		ClassObject from = (ClassObject) fromShape;
 		ClassObject to = (ClassObject) toShape;
-
-		isCompleted = true;
-		start = new AnchorPoint(startP);
-		end = new AnchorPoint(endP);
-
-		start.setConnectedShape(from);
-		start.setLine(this);
-		end.setConnectedShape(to);
-		end.setLine(this);
-
-		segments = new ArrayList<Line.LineSegment>();
-		segments.add(new LineSegment(start, end));
-		from.addAnchor(start);
-		to.addAnchor(end);
-		isCorrect = true;
 		if (from.isInterface() == to.isInterface()) {
 			shapetype = ShapeType.GENERALIZATION;
 		} else {
@@ -75,12 +63,6 @@ public class Generalization extends Line {
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public boolean isInside(Point p) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override
@@ -146,15 +128,14 @@ public class Generalization extends Line {
 
 	@Override
 	public JPopupMenu getPopupMenu() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PopupMenu(this);
 	}
 
 	@Override
 	public void update(boolean recursive) {
 		// TODO implement recursive order
-		ClassObject from = (ClassObject) start.getConnectedShape();
-		ClassObject to = (ClassObject) end.getConnectedShape();
+		ClassObject from = (ClassObject) startPoint.getConnectedShape();
+		ClassObject to = (ClassObject) endPoint.getConnectedShape();
 		isCorrect = true;
 		if (from.isInterface() == to.isInterface()) {
 			shapetype = ShapeType.GENERALIZATION;
@@ -198,11 +179,11 @@ public class Generalization extends Line {
 
 		private GeneralizationSaveState(Generalization obj) {
 			type = obj.shapetype;
-			if (obj.start != null && obj.end != null) {
-				startX = obj.start.getX();
-				startY = obj.start.getY();
-				endX = obj.end.getX();
-				endY = obj.end.getY();
+			if (obj.startPoint != null && obj.endPoint != null) {
+				startX = obj.startPoint.getX();
+				startY = obj.startPoint.getY();
+				endX = obj.endPoint.getX();
+				endY = obj.endPoint.getY();
 			} else {
 				startX = obj.startP.x;
 				startY = obj.startP.y;
@@ -213,4 +194,22 @@ public class Generalization extends Line {
 
 	}
 
+	@SuppressWarnings("serial")
+	private static class PopupMenu extends JPopupMenu{
+		private PopupMenu(Generalization line){
+			
+			add(new JMenuItem(new AbstractAction("Löschen") {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					line.delete(null);
+					Canvas.getInstance().repaint();
+				}
+			}));
+			
+			
+			
+		}
+		
+	}
+	
 }

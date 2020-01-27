@@ -21,8 +21,8 @@ public abstract class Shape {
 	private final static float[] dash = {5.0f};
 	public final static Stroke DASHEDLINE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0.0f,dash,0.0f);
 	public final static Stroke BASICLINE = new BasicStroke();
-	public final static Font BASICFONT 	= new Font("Sans_Serif", Font.PLAIN, 12);
-	public final static Font ITALICFONT = new Font("Sans_Serif", Font.ITALIC, 12);
+	public final static Font BASICFONT 	= new Font("Sans_Serif", Font.PLAIN, 16);
+	public final static Font ITALICFONT = new Font("Sans_Serif", Font.ITALIC, 16);
 	
 	
 	protected ShapeType shapetype;
