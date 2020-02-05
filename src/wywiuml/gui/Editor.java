@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 
+import wywiuml.shapes.ClassObject;
+
 
 @SuppressWarnings("serial")
 public class Editor extends JFrame{
@@ -15,6 +17,10 @@ public class Editor extends JFrame{
 		this.add(new Menubar(), BorderLayout.NORTH);
 		this.add(new Toolbar(), BorderLayout.WEST);
 		this.add(Canvas.getInstance(), BorderLayout.CENTER);
+		
+		//Create example
+		ClassObject obj = new ClassObject(150, 80);
+		Canvas.getInstance().addShape(obj);
 	}
 	
 	

@@ -9,18 +9,17 @@ import wywiuml.gui.Canvas;
 import wywiuml.shapes.Line.LineSegment;
 import wywiuml.shapes.Shape.ShapeType;
 
-
 public abstract class Line extends Shape {
 
 	protected List<LineSegment> segments = new ArrayList<LineSegment>();
 	public AnchorPoint startPoint;
 	public AnchorPoint endPoint;
 	protected Point startP, endP;
-	
+
 	public boolean complete(Shape fromShape, Shape toShape) {
 		if (fromShape == null || toShape == null || fromShape.shapetype != ShapeType.CLASS
 				|| toShape.shapetype != ShapeType.CLASS)
-			return false; 
+			return false;
 
 		ClassObject from = (ClassObject) fromShape;
 		ClassObject to = (ClassObject) toShape;
@@ -39,23 +38,27 @@ public abstract class Line extends Shape {
 		to.addAnchor(endPoint);
 		return true;
 	}
-	
+
 	@Override
 	public boolean isInside(Point p) {
-		if(getSegmentAt(p) == null)
+		return isInside(p, 5);
+	}
+	
+	public boolean isInside(Point p, int tolerance) {
+		if (getSegmentAt(p, tolerance) == null)
 			return false;
 		return true;
 	}
-	
-	public LineSegment getSegmentAt(Point p) {
-		for(LineSegment s : segments) {
-			if(s.isInside(p, 1)) {
+
+	public LineSegment getSegmentAt(Point p, int tolerance) {
+		for (LineSegment s : segments) {
+			if (s.isInside(p, tolerance)) {
 				return s;
 			}
 		}
 		return null;
 	}
-	
+
 	protected void drawLinePath(Graphics g) {
 		if (segments == null)
 			return;
@@ -67,28 +70,27 @@ public abstract class Line extends Shape {
 	@Override
 	public void delete(Shape source) {
 		System.out.println("delete line");
-		if(source == null) {
-			if(startPoint != null)
+		if (source == null) {
+			if (startPoint != null)
 				startPoint.delete(this);
-			if(endPoint != null)
+			if (endPoint != null)
 				endPoint.delete(this);
 			Canvas.getInstance().removeShape(this);
 			return;
 		}
-		
-		if(source.getShapeType() == ShapeType.ANCHOR) {
+
+		if (source.getShapeType() == ShapeType.ANCHOR) {
 			Canvas.getInstance().removeShape(this);
-			if(source != startPoint)
+			if (source != startPoint)
 				startPoint.delete(this);
-			if(source != endPoint)
+			if (source != endPoint)
 				endPoint.delete(this);
 			// TODO
 			return;
 		}
 		super.delete(source);
 	}
-	
-	
+
 	public class LineSegment {
 		private AnchorPoint start;
 		private AnchorPoint end;
@@ -106,31 +108,31 @@ public abstract class Line extends Shape {
 			split[1] = new LineSegment(middlePoint, end);
 			return split;
 		}
-		
+
 		public boolean isInside(Point p, int tolerance) {
-			//Distance funkction from stackoverflow post:
-			//https://stackoverflow.com/questions/30559799/function-for-finding-the-distance-between-a-point-and-an-edge-in-java
-			
-			//getDistance
+			// Distance funkction from stackoverflow post:
+			// https://stackoverflow.com/questions/30559799/function-for-finding-the-distance-between-a-point-and-an-edge-in-java
+
+			// getDistance
 			float a = p.x - start.getX();
 			float b = p.y - start.getY();
-			float c = end.getX()-start.getX();
-			float d = end.getY()-start.getY();
+			float c = end.getX() - start.getX();
+			float d = end.getY() - start.getY();
 			float e = -d;
 			float f = c;
-			
-			float dot = a*e+b*f;
-			float len_sq = e*e+f*f;
-			
-			double dist = Math.abs(dot)/Math.sqrt(len_sq);
-			
-			if(dist<=tolerance)
+
+			float dot = a * e + b * f;
+			float len_sq = e * e + f * f;
+
+			double dist = Math.abs(dot) / Math.sqrt(len_sq);
+
+			if (dist <= tolerance)
 				return true;
 			else
 				return false;
 		}
 	}
-	
+
 	protected static class Vector2D {
 		protected double x;
 		protected double y;
@@ -158,6 +160,5 @@ public abstract class Line extends Shape {
 			return "(" + x + ", " + y + ")";
 		}
 	}
-
 
 }

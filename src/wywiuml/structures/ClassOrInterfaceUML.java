@@ -31,13 +31,13 @@ public class ClassOrInterfaceUML {
 	private final static String visibilityCharacters = "[+#~-]";
 	private final static String namingRegEx = firstCharacters + followingCharacters + "*";
 
-	private final static String classRegex = "={3,}Name={3,}(.*)={3,}Attribute={3,}(.*)={3,}Methoden={3,}(.*)";
-	private final static String nameRegex = "^\\s*(" + visibilityCharacters + "?)" + "\\s*(" + namingRegEx + ")";
-	private final static String attributeRegex = "^\\s*(" + visibilityCharacters + "?)\\s*(" + namingRegEx
+	final static String classRegex = "={3,}Name={3,}(.*)={3,}Attribute={3,}(.*)={3,}Methoden={3,}(.*)";
+	final static String nameRegex = "^\\s*(" + visibilityCharacters + "?)" + "\\s*(" + namingRegEx + ")";
+	final static String attributeRegex = "^\\s*(" + visibilityCharacters + "?)\\s*(" + namingRegEx
 			+ ")\\s*:\\s*(" + namingRegEx + ")";
-	private final static String methodRegex = "^\\s*(" + visibilityCharacters + "?)\\s*(" + namingRegEx
+	final static String methodRegex = "^\\s*(" + visibilityCharacters + "?)\\s*(" + namingRegEx
 			+ ")\\s*\\((.*)\\)\\s*:\\s*(" + namingRegEx + ")";
-	private final static String parameterRegex = "^(" + namingRegEx + ")\\s(" + namingRegEx + ")$";
+	final static String parameterRegex = "^(" + namingRegEx + ")\\s(" + namingRegEx + ")$";
 
 	static List<ClassOrInterfaceUML> allClassesOrInterfaces = new ArrayList<ClassOrInterfaceUML>();
 
