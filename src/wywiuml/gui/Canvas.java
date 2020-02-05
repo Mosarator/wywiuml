@@ -84,6 +84,7 @@ public class Canvas extends JPanel {
 	public Shape addShape(Shape obj) {
 		shapes.add(obj);
 		sortObjects();
+		repaint();
 		return obj;
 	}
 
@@ -92,11 +93,12 @@ public class Canvas extends JPanel {
 	}
 	
 	public void clean() {
-		for(Shape s : shapes) {
+		ClassOrInterfaceUML.removeAll();
+		/*for(Shape s : shapes) {
 			if(s.getShapeType() == ShapeType.CLASS) {
 				ClassOrInterfaceUML.removeFromList( ((ClassObject) s).getUMLInfo());
 			}
-		}
+		}*/
 		shapes.clear();
 	}
 	
@@ -126,9 +128,20 @@ public class Canvas extends JPanel {
 	}
 
 	public Shape getShapeAt(Point p) {
-		for (Shape obj : shapes) {
-			if (obj.isInside(p))
-				return obj;
+		return getShapeAt(p, null);
+	}
+	
+	public Shape getShapeAt(Point p, ShapeType filter) {
+		if(filter == null) {
+			for (Shape obj : shapes) {
+				if (obj.isInside(p))
+					return obj;
+			}
+		}else {
+			for (Shape obj : shapes) {
+				if ((obj.getShapeType() == filter)&&(obj.isInside(p)))
+					return obj;
+			}
 		}
 		return null;
 	}
@@ -188,12 +201,14 @@ public class Canvas extends JPanel {
 	}
 
 	private void sortObjects() {
+		//System.out.println("begin sort");
 		shapes.sort(new Comparator<Shape>() {
 			@Override
 			public int compare(Shape o1, Shape o2) {
 				return o1.getShapeType().compareTo(o2.getShapeType());
 			}
 		});
+		//System.out.println("End Sort");
 	}
 
 	private void highlightMode(Graphics g) {
@@ -206,6 +221,7 @@ public class Canvas extends JPanel {
 		String text = "Mausclick: " + currentMode.getDescription();
 
 		// Get Fontmetrics
+		g.setFont(Shape.BASICFONT);
 		FontMetrics metrics = g.getFontMetrics();
 		int width = metrics.stringWidth(text);
 		int height = metrics.getHeight();

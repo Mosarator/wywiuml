@@ -36,10 +36,13 @@ public class Association extends Line {
 		endP = end.getLocation();
 		isCompleted = completed;
 		if (completed) {
-			complete(Canvas.getInstance().getShapeAt(start), Canvas.getInstance().getShapeAt(end));
+			boolean success = complete(Canvas.getInstance().getShapeAt(start, ShapeType.CLASS), Canvas.getInstance().getShapeAt(end, ShapeType.CLASS));
+			if(success == false)
+				// Default behavior;
+				shapetype = ShapeType.ASSOCIATON;
 		} else {
-			// Default berhaviour;
-			shapetype = ShapeType.GENERALIZATION;
+			// Default behavior;
+			shapetype = ShapeType.ASSOCIATON;
 		}
 	}
 
@@ -51,7 +54,7 @@ public class Association extends Line {
 		ClassObject from = (ClassObject) fromShape;
 		ClassObject to = (ClassObject) toShape;
 
-		if (from.isInterface() == to.isInterface()) {
+		/*if (from.isInterface() == to.isInterface()) {
 			shapetype = ShapeType.GENERALIZATION;
 		} else {
 			if (to.isInterface()) {
@@ -60,7 +63,10 @@ public class Association extends Line {
 				shapetype = ShapeType.GENERALIZATION;
 				isCorrect = false;
 			}
-		}
+		}*/
+		//TODO
+		shapetype = ShapeType.ASSOCIATON;
+		isCorrect = false;
 		return true;
 	}
 

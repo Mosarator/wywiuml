@@ -38,7 +38,10 @@ public class Generalization extends Line {
 		endP = end.getLocation();
 		isCompleted = completed;
 		if (completed) {
-			complete(Canvas.getInstance().getShapeAt(start), Canvas.getInstance().getShapeAt(end));
+			boolean success = complete(Canvas.getInstance().getShapeAt(start, ShapeType.CLASS), Canvas.getInstance().getShapeAt(end, ShapeType.CLASS));
+			if(success == false)
+				// Default behaviour;
+				shapetype = ShapeType.GENERALIZATION;
 		} else {
 			// Default behaviour;
 			shapetype = ShapeType.GENERALIZATION;

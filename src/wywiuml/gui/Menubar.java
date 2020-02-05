@@ -49,7 +49,7 @@ public class Menubar extends JMenuBar {
 					//early exit
 					return;
 				}
-				
+				canvas.clean();
 				String path = chooser.getSelectedFile().getAbsolutePath();
 
 				// TODO get Path first

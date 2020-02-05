@@ -49,7 +49,7 @@ public abstract class Line extends Shape {
 	
 	public LineSegment getSegmentAt(Point p) {
 		for(LineSegment s : segments) {
-			if(s.isInside(p, 5)) {
+			if(s.isInside(p, 1)) {
 				return s;
 			}
 		}
