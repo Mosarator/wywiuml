@@ -43,8 +43,38 @@ public class Menubar extends JMenuBar {
 		JMenuItem importMenu = new JMenu("Importieren...");
 		menu.add(importMenu);
 
-		JMenuItem importFromCode = new JMenuItem(new AbstractAction("... aus Projektpfad") {
+		JMenuItem importFromCode = new JMenuItem(new AbstractAction("... aus Java Klasse") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Canvas canvas = Canvas.getInstance();
 
+				String filepath;
+				if (lastPath.isEmpty()) {
+					filepath = System.getProperty("user.home");
+				} else {
+					filepath = lastPath;
+				}
+				JFileChooser chooser = new JFileChooser(filepath);
+				int choice = chooser.showOpenDialog(null);
+				if (choice != JFileChooser.APPROVE_OPTION) {
+					// early exit
+					return;
+				}
+				File file = chooser.getSelectedFile();
+				if(file.getName().endsWith(".java") == false) {
+					JOptionPane.showMessageDialog(null, "Keine Java Datei");
+					return;
+				}
+				List<ClassOrInterfaceDeclaration> cids = Parser.parseClassesFromFile(file);
+				for(ClassOrInterfaceDeclaration cid : cids) {
+					canvas.addShape(ClassObject.fromUMLInfo(ClassOrInterfaceUML.fromDeclaration(cid)));
+				}
+				
+			}
+		});
+		importMenu.add(importFromCode);
+
+		JMenuItem importFromPath = new JMenuItem(new AbstractAction("... aus Projektpfad") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
@@ -136,7 +166,7 @@ public class Menubar extends JMenuBar {
 				canvas.repaint();
 			}
 		});
-		importMenu.add(importFromCode);
+		importMenu.add(importFromPath);
 
 		JMenuItem export = new JMenu("Exportieren...");
 		menu.add(export);
@@ -181,27 +211,27 @@ public class Menubar extends JMenuBar {
 						classobjects.add((ClassObject) s);
 					}
 				}
-				
+
 				// Create copies for later
 				List<ClassOrInterfaceUML> cloneInfos = new ArrayList<ClassOrInterfaceUML>();
-				for(ClassObject obj : classobjects) {
+				for (ClassObject obj : classobjects) {
 					cloneInfos.add(obj.getUMLInfo().clone());
 				}
-				
+
 				// implement Generalizations and associations
 				for (Shape s : canvas.getShapes()) {
 
 					ClassObject from;
 					ClassObject to;
-					switch(s.getShapeType()) {
+					switch (s.getShapeType()) {
 						case GENERALIZATION:
 						case REALIZATION:
 							Generalization g = (Generalization) s;
 							from = (ClassObject) (g.startPoint.getConnectedShape());
 							to = (ClassObject) (g.endPoint.getConnectedShape());
-							if(g.getShapeType() == ShapeType.GENERALIZATION) {
+							if (g.getShapeType() == ShapeType.GENERALIZATION) {
 								from.getUMLInfo().addExtendedClass(to.getUMLInfo().getName());
-							}else {
+							} else {
 								from.getUMLInfo().addImplementedClass(to.getUMLInfo().getName());
 							}
 							break;
@@ -211,13 +241,13 @@ public class Menubar extends JMenuBar {
 							Association a = (Association) s;
 							from = (ClassObject) (a.startPoint.getConnectedShape());
 							to = (ClassObject) (a.endPoint.getConnectedShape());
-							from.getUMLInfo().addAttributeFromUMLString(a.getVariable() + ":" + to.getUMLInfo().getName());
+							from.getUMLInfo()
+									.addAttributeFromUMLString(a.getVariable() + ":" + to.getUMLInfo().getName());
 							break;
 						default:
-								break;
+							break;
 					}
 				}
-				
 
 				String filepath;
 				if (lastPath.isEmpty()) {
@@ -234,23 +264,24 @@ public class Menubar extends JMenuBar {
 						lastPath = filepath;
 						for (ClassObject obj : classobjects) {
 							try {
-								filepath = chooser.getSelectedFile().getAbsolutePath() + "/" + obj.getUMLInfo().getName() + ".java";
+								filepath = chooser.getSelectedFile().getAbsolutePath() + "/"
+										+ obj.getUMLInfo().getName() + ".java";
 								File outputfile = new File(filepath);
 								BufferedWriter writer = new BufferedWriter(new FileWriter(outputfile));
 								writer.write(obj.getUMLInfo().toCode());
 								writer.close();
 							} catch (Exception error) {
 								JOptionPane.showMessageDialog(null,
-										"Problem while writing in File: " + obj.getUMLInfo().getName() + ".java");		
+										"Problem while writing in File: " + obj.getUMLInfo().getName() + ".java");
 							}
 						}
 					default:
 						// do nothing
 						break;
 				}
-				
+
 				// Reset the ClassInformations
-				for(int i= 0; i< classobjects.size(); i++) {
+				for (int i = 0; i < classobjects.size(); i++) {
 					classobjects.get(i).setUMLInfo(cloneInfos.get(i));
 				}
 			}
@@ -272,12 +303,11 @@ public class Menubar extends JMenuBar {
 							FileOutputStream outFile = new FileOutputStream(file);
 							ObjectOutputStream out = new ObjectOutputStream(outFile);
 							out.writeObject(Canvas.getInstance().getSaveState());
-							System.out.println("speichern erfolgreich");
 							out.close();
 							outFile.close();
 
 						} catch (Exception error) {
-							System.out.println(error.getMessage());
+							JOptionPane.showMessageDialog(null, error.getMessage());
 						}
 						break;
 					default:
@@ -298,14 +328,12 @@ public class Menubar extends JMenuBar {
 						try {
 							FileInputStream inFile = new FileInputStream(chooser.getSelectedFile());
 							ObjectInputStream in = new ObjectInputStream(inFile);
-							System.out.println("Laden initialisieren");
 							Canvas.getInstance().readSaveState((Serializable) in.readObject());
-							System.out.println("Laden erfolgreich");
 							in.close();
 							inFile.close();
 							Canvas.getInstance().repaint();
 						} catch (Exception error) {
-							System.out.println(error.getMessage());
+							JOptionPane.showMessageDialog(null, error.getMessage());
 						}
 						break;
 					default:

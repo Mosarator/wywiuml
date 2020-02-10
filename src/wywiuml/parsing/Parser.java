@@ -20,202 +20,216 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 public class Parser {
 
-    final static String testdirPath = System.getProperty("user.dir");
-    // final static String dirPath =
-    // "F:\\Dokumente\\eclipse-workspace\\GIT_UML-Editor\\src";
-    private final static FilenameFilter fileFilter = new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-            // Accept all directories and .java files
-            if (new File(dir + File.separator + name).isDirectory())
-                return true;
-            return name.contains(".java");
-        }
-    };
+	final static String testdirPath = System.getProperty("user.dir");
+	// final static String dirPath =
+	// "F:\\Dokumente\\eclipse-workspace\\GIT_UML-Editor\\src";
+	private final static FilenameFilter fileFilter = new FilenameFilter() {
+		@Override
+		public boolean accept(File dir, String name) {
+			// Accept all directories and .java files
+			if (new File(dir + File.separator + name).isDirectory())
+				return true;
+			return name.contains(".java");
+		}
+	};
 
-    // =================================================
+	// =================================================
 
-    public static List<ClassOrInterfaceDeclaration> parseClassesFromProjectPath(String projectPath) {
-        List<ClassOrInterfaceDeclaration> allClasses = new ArrayList<ClassOrInterfaceDeclaration>();
+	public static List<ClassOrInterfaceDeclaration> parseClassesFromProjectPath(String projectPath) {
+		List<ClassOrInterfaceDeclaration> allClasses = new ArrayList<ClassOrInterfaceDeclaration>();
 
-        // First, get all .java files in the Project
-        List<File> allFiles = getAllJavaFiles(projectPath);
+		// First, get all .java files in the Project
+		List<File> allFiles = getAllJavaFiles(projectPath);
 
-        for (File f : allFiles) {
-            // Turn the file into an CompilationUnit
-            CompilationUnit cu = null;
-            try {
-                cu = StaticJavaParser.parse(f);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                continue;
-            }
-            // Extract all classes
-            VoidVisitor<List<ClassOrInterfaceDeclaration>> classVisitor = new ClassVisitorAdapter();
-            classVisitor.visit(cu, allClasses);
-        }
-        return allClasses;
-    }
+		for (File f : allFiles) {
+			// Turn the file into an CompilationUnit
+			CompilationUnit cu = null;
+			try {
+				cu = StaticJavaParser.parse(f);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				continue;
+			}
+			// Extract all classes
+			VoidVisitor<List<ClassOrInterfaceDeclaration>> classVisitor = new ClassVisitorAdapter();
+			classVisitor.visit(cu, allClasses);
+		}
+		return allClasses;
+	}
 
-    public static String parseClassnameToUML(ClassOrInterfaceDeclaration cid) {
-        StringBuilder str = new StringBuilder("");
-        boolean hasVisibilityModifier = false;
-        for (Modifier m : cid.getModifiers()) {
-            if (m.getKeyword() == Modifier.Keyword.PRIVATE) {
-                str.append("-");
-                hasVisibilityModifier = true;
-            } else if (m.getKeyword() == Modifier.Keyword.PROTECTED) {
-                str.append("~");
-                hasVisibilityModifier = true;
-            } else if (m.getKeyword() == Modifier.Keyword.PUBLIC) {
-                str.append("+");
-                hasVisibilityModifier = true;
-            }
-        }
-        if (hasVisibilityModifier == false) {
-            str.append("#");
-        }
-        str.append(cid.getNameAsString());
-        return str.toString();
-    }
+	public static List<ClassOrInterfaceDeclaration> parseClassesFromFile(File f) {
+		List<ClassOrInterfaceDeclaration> allClasses = new ArrayList<ClassOrInterfaceDeclaration>();
 
-    public static List<FieldDeclaration> getFields(ClassOrInterfaceDeclaration cid) {
+		CompilationUnit cu = null;
+		try {
+			cu = StaticJavaParser.parse(f);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		// Extract all classes
+		VoidVisitor<List<ClassOrInterfaceDeclaration>> classVisitor = new ClassVisitorAdapter();
+		classVisitor.visit(cu, allClasses);
 
-        List<FieldDeclaration> listField = new ArrayList<FieldDeclaration>();
-        FieldCollector fieldCollector = new FieldCollector();
-        fieldCollector.setContext(cid);
-        fieldCollector.visit(cid, listField);
+		return allClasses;
+	}
 
-        return listField;
-    }
+	public static String parseClassnameToUML(ClassOrInterfaceDeclaration cid) {
+		StringBuilder str = new StringBuilder("");
+		boolean hasVisibilityModifier = false;
+		for (Modifier m : cid.getModifiers()) {
+			if (m.getKeyword() == Modifier.Keyword.PRIVATE) {
+				str.append("-");
+				hasVisibilityModifier = true;
+			} else if (m.getKeyword() == Modifier.Keyword.PROTECTED) {
+				str.append("~");
+				hasVisibilityModifier = true;
+			} else if (m.getKeyword() == Modifier.Keyword.PUBLIC) {
+				str.append("+");
+				hasVisibilityModifier = true;
+			}
+		}
+		if (hasVisibilityModifier == false) {
+			str.append("#");
+		}
+		str.append(cid.getNameAsString());
+		return str.toString();
+	}
 
-    public static List<MethodDeclaration> getMethods(ClassOrInterfaceDeclaration cid) {
+	public static List<FieldDeclaration> getFields(ClassOrInterfaceDeclaration cid) {
 
-        List<MethodDeclaration> methodList = new ArrayList<MethodDeclaration>();
-        MethodCollector methodsCollector = new MethodCollector();
-        methodsCollector.setContext(cid);
-        methodsCollector.visit(cid, methodList);
+		List<FieldDeclaration> listField = new ArrayList<FieldDeclaration>();
+		FieldCollector fieldCollector = new FieldCollector();
+		fieldCollector.setContext(cid);
+		fieldCollector.visit(cid, listField);
 
-        return methodList;
-    }
-    
-    public static List<ConstructorDeclaration> getConstructors(ClassOrInterfaceDeclaration cid){
-    	
-    	 List<ConstructorDeclaration> constructorList = new ArrayList<ConstructorDeclaration>();
-    	 ConstructorCollector constructorCollector = new ConstructorCollector();
-    	 constructorCollector.setContext(cid);
-    	 constructorCollector.visit(cid, constructorList);
+		return listField;
+	}
 
-         return constructorList;
-    	
-    }
+	public static List<MethodDeclaration> getMethods(ClassOrInterfaceDeclaration cid) {
 
-    @SuppressWarnings("rawtypes")
+		List<MethodDeclaration> methodList = new ArrayList<MethodDeclaration>();
+		MethodCollector methodsCollector = new MethodCollector();
+		methodsCollector.setContext(cid);
+		methodsCollector.visit(cid, methodList);
+
+		return methodList;
+	}
+
+	public static List<ConstructorDeclaration> getConstructors(ClassOrInterfaceDeclaration cid) {
+
+		List<ConstructorDeclaration> constructorList = new ArrayList<ConstructorDeclaration>();
+		ConstructorCollector constructorCollector = new ConstructorCollector();
+		constructorCollector.setContext(cid);
+		constructorCollector.visit(cid, constructorList);
+
+		return constructorList;
+
+	}
+
+	@SuppressWarnings("rawtypes")
 	public static void sort(ClassOrInterfaceDeclaration cid) {
-        cid.getMembers().sort(new Comparator<BodyDeclaration>() {
-            @Override
-            public int compare(BodyDeclaration o1, BodyDeclaration o2) {
-                if (o1.isFieldDeclaration() && o2.isMethodDeclaration())
-                    return -1;
-                if (o1.isMethodDeclaration() && o2.isFieldDeclaration())
-                    return 1;
-                if (o1.isClassOrInterfaceDeclaration() && !o2.isClassOrInterfaceDeclaration())
-                    return 1;
-                if (!o1.isClassOrInterfaceDeclaration() && o2.isClassOrInterfaceDeclaration())
-                    return -1;
-                
-                return 0;
-            }
-        });
-    }
+		cid.getMembers().sort(new Comparator<BodyDeclaration>() {
+			@Override
+			public int compare(BodyDeclaration o1, BodyDeclaration o2) {
+				if (o1.isFieldDeclaration() && o2.isMethodDeclaration())
+					return -1;
+				if (o1.isMethodDeclaration() && o2.isFieldDeclaration())
+					return 1;
+				if (o1.isClassOrInterfaceDeclaration() && !o2.isClassOrInterfaceDeclaration())
+					return 1;
+				if (!o1.isClassOrInterfaceDeclaration() && o2.isClassOrInterfaceDeclaration())
+					return -1;
 
-   
-    private static List<File> getAllJavaFiles(String path) {
+				return 0;
+			}
+		});
+	}
 
-        List<File> list = new ArrayList<File>();
+	private static List<File> getAllJavaFiles(String path) {
 
-        File directory = new File(path);
-        if (directory.isDirectory() == false) {
-            directory = directory.getParentFile();
-        }
+		List<File> list = new ArrayList<File>();
 
-        // get all files of current directory
-        File[] files = directory.listFiles(fileFilter);
-        // System.out.println("files:" + files.length);
-        if (files != null) {
-            for (File f : files) {
-                if (f.isFile())
-                    list.add(f);
-                else if (f.isDirectory())
-                    // Go down every Directory
-                    list.addAll(getAllJavaFiles(f.getAbsolutePath()));
-            }
-        }
+		File directory = new File(path);
+		if (directory.isDirectory() == false) {
+			directory = directory.getParentFile();
+		}
 
-        return list;
-    }
+		// get all files of current directory
+		File[] files = directory.listFiles(fileFilter);
+		// System.out.println("files:" + files.length);
+		if (files != null) {
+			for (File f : files) {
+				if (f.isFile())
+					list.add(f);
+				else if (f.isDirectory())
+					// Go down every Directory
+					list.addAll(getAllJavaFiles(f.getAbsolutePath()));
+			}
+		}
 
-    private static class ClassVisitorAdapter extends VoidVisitorAdapter<List<ClassOrInterfaceDeclaration>> {
+		return list;
+	}
 
-        @Override
-        public void visit(ClassOrInterfaceDeclaration cid, List<ClassOrInterfaceDeclaration> list) {
-            super.visit(cid, list);
-            list.add(cid);
-        }
-    }
-    
-    private static class ConstructorCollector extends VoidVisitorAdapter<List<ConstructorDeclaration>>{
-    	 
-    	private ClassOrInterfaceDeclaration contextClass;
+	private static class ClassVisitorAdapter extends VoidVisitorAdapter<List<ClassOrInterfaceDeclaration>> {
 
-        public void setContext(ClassOrInterfaceDeclaration cid) {
-        	contextClass = cid;
-        }	
-        
-        @Override
-        public void visit(ConstructorDeclaration cd, List<ConstructorDeclaration> output) {
-        	// TODO Auto-generated method stub
-        	super.visit(cd, output);
-        	if (cd.getParentNode().get() == contextClass) {
-                output.add(cd);
-            }
-        }
-    	
-    }
-    
+		@Override
+		public void visit(ClassOrInterfaceDeclaration cid, List<ClassOrInterfaceDeclaration> list) {
+			super.visit(cid, list);
+			list.add(cid);
+		}
+	}
 
-    private static class MethodCollector extends VoidVisitorAdapter<List<MethodDeclaration>> {
+	private static class ConstructorCollector extends VoidVisitorAdapter<List<ConstructorDeclaration>> {
 
-        private ClassOrInterfaceDeclaration contextClass;
+		private ClassOrInterfaceDeclaration contextClass;
 
-        public void setContext(ClassOrInterfaceDeclaration cid) {
-            contextClass = cid;
-        }
+		public void setContext(ClassOrInterfaceDeclaration cid) {
+			contextClass = cid;
+		}
 
-        @Override
-        public void visit(MethodDeclaration md, List<MethodDeclaration> output) {
-            super.visit(md, output);
-            if (md.getParentNode().get() == contextClass) {
-                output.add(md);
-            }
-        }
-    }
+		@Override
+		public void visit(ConstructorDeclaration cd, List<ConstructorDeclaration> output) {
+			// TODO Auto-generated method stub
+			super.visit(cd, output);
+			if (cd.getParentNode().get() == contextClass) {
+				output.add(cd);
+			}
+		}
 
-    private static class FieldCollector extends VoidVisitorAdapter<List<FieldDeclaration>> {
+	}
 
-        private ClassOrInterfaceDeclaration contextClass;
+	private static class MethodCollector extends VoidVisitorAdapter<List<MethodDeclaration>> {
 
-        public void setContext(ClassOrInterfaceDeclaration cid) {
-            contextClass = cid;
-        }
+		private ClassOrInterfaceDeclaration contextClass;
 
-        @Override
-        public void visit(FieldDeclaration fd, List<FieldDeclaration> output) {
-            super.visit(fd, output);
-            if (fd.getParentNode().get() == contextClass) {
-                output.add(fd);
-            }
-        }
-    }
+		public void setContext(ClassOrInterfaceDeclaration cid) {
+			contextClass = cid;
+		}
+
+		@Override
+		public void visit(MethodDeclaration md, List<MethodDeclaration> output) {
+			super.visit(md, output);
+			if (md.getParentNode().get() == contextClass) {
+				output.add(md);
+			}
+		}
+	}
+
+	private static class FieldCollector extends VoidVisitorAdapter<List<FieldDeclaration>> {
+
+		private ClassOrInterfaceDeclaration contextClass;
+
+		public void setContext(ClassOrInterfaceDeclaration cid) {
+			contextClass = cid;
+		}
+
+		@Override
+		public void visit(FieldDeclaration fd, List<FieldDeclaration> output) {
+			super.visit(fd, output);
+			if (fd.getParentNode().get() == contextClass) {
+				output.add(fd);
+			}
+		}
+	}
 
 }

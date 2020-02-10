@@ -90,6 +90,8 @@ public class SelectAndEditMode extends MouseMode {
 					) {
 				editWindow = ((Association) obj).getEditWindow();
 			}
+			if(editWindow == null)
+				return;
 			editWindow.setVisible(false);
 			canvas.add(editWindow);
 			editWindow.setVisible(true);

@@ -85,16 +85,12 @@ public class AnchorPoint extends Shape {
 			//Stick to the border
 			int min = Math.min(Math.min(diffL, diffR), Math.min(diffT, diffB));
 			if (min == diffL) {
-				System.out.println("Links");
 				setX(connectedShape.pos.x);
 			} else if (min == diffR) {
-				System.out.println("Rechts");
 				setX(connectedShape.pos.x + connectedShape.dim.width);
 			} else if (min == diffT) {
-				System.out.println("Oben");
 				setY(connectedShape.pos.y);
 			} else {
-				System.out.println("Unten");
 				setY(connectedShape.pos.y + connectedShape.dim.height);
 			}
 		}

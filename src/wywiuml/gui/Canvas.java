@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import wywiuml.mouseMode.CancelMode;
@@ -70,16 +71,18 @@ public class Canvas extends JPanel {
 		g.setColor(BACKGROUND);
 		g.fillRect(0, 0, getSize().width, getSize().height);
 
-		// call the draw-method for every umlObject
-		for (Shape obj : shapes) {
-			if (obj.isHidden() == false)
-				obj.draw(g);
+		// call the draw-method for every umlObject but in reverse order, so that
+		// Anchors and Classes dont get overlapped by lines
+		for (int i = shapes.size()-1; i >= 0; i--) {
+			if (shapes.get(i).isHidden() == false)
+				shapes.get(i).draw(g);
 		}
+
 		// Draw Panels
 		for (Component comp : getComponents()) {
 			comp.repaint();
 		}
-		// Highlight current Mode
+		// Highlight current Mode in upperleft corner
 		highlightMode(g);
 	}
 
@@ -93,23 +96,18 @@ public class Canvas extends JPanel {
 	public void removeShape(Shape obj) {
 		shapes.remove(obj);
 	}
-	
+
 	public void clean() {
 		ClassOrInterfaceUML.removeAll();
-		/*for(Shape s : shapes) {
-			if(s.getShapeType() == ShapeType.CLASS) {
-				ClassOrInterfaceUML.removeFromList( ((ClassObject) s).getUMLInfo());
-			}
-		}*/
 		shapes.clear();
 	}
-	
+
 	public boolean getIsEditing() {
 		return isEditing;
 	}
 
 	public void setIsEditing(boolean b) {
-		if(b) {
+		if (b) {
 			lastMode = currentMode;
 			setMouseMode(new CancelMode());
 		}
@@ -136,16 +134,22 @@ public class Canvas extends JPanel {
 	public Shape getShapeAt(Point p) {
 		return getShapeAt(p, null);
 	}
-	
+
 	public Shape getShapeAt(Point p, ShapeType filter) {
-		if(filter == null) {
+		if (filter == null) {
 			for (Shape obj : shapes) {
+				// hidden objects should not be clickable
+				if(obj.isHidden())
+					continue;
 				if (obj.isInside(p))
 					return obj;
 			}
-		}else {
+		} else {
 			for (Shape obj : shapes) {
-				if ((obj.getShapeType() == filter)&&(obj.isInside(p)))
+				// hidden objects should not be clickable
+				if(obj.isHidden())
+					continue;
+				if ((obj.getShapeType() == filter) && (obj.isInside(p)))
 					return obj;
 			}
 		}
@@ -161,7 +165,7 @@ public class Canvas extends JPanel {
 		try {
 			cs = (CanvasSaveState) state;
 		} catch (Exception error) {
-			System.out.println(error.getMessage());
+			JOptionPane.showMessageDialog(null, error.getMessage());
 			return;
 		}
 		shapes.clear();
@@ -214,14 +218,12 @@ public class Canvas extends JPanel {
 	}
 
 	private void sortObjects() {
-		//System.out.println("begin sort");
 		shapes.sort(new Comparator<Shape>() {
 			@Override
 			public int compare(Shape o1, Shape o2) {
 				return o1.getShapeType().compareTo(o2.getShapeType());
 			}
 		});
-		//System.out.println("End Sort");
 	}
 
 	private void highlightMode(Graphics g) {

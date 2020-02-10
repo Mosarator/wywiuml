@@ -31,9 +31,13 @@ public class ClassOrInterfaceUML {
 
 	final static String classRegex = "={3,}Name={3,}(.*)={3,}Attribute={3,}(.*)={3,}Methoden={3,}(.*)";
 	final static String nameRegex = "^\\s*(" + visibilityCharacters + "?)" + "\\s*(" + namingRegEx + ")";
-	final static String attributeRegex = "^\\s*(" + visibilityCharacters + "?)\\s*(" + namingRegEx + ")\\s*:\\s*("+ namingRegEx + ")";
-	final static String methodRegex = "^\\s*(" + visibilityCharacters + "?)\\s*(" + namingRegEx+ ")\\s*\\((.*)\\)\\s*:\\s*(" + namingRegEx + ")";
-	final static String parameterRegex = "^(" + namingRegEx + ")\\s(" + namingRegEx + ")$";
+	final static String attributeRegex = "^\\s*(" + visibilityCharacters + "?)\\s*(" + namingRegEx + ")\\s*:\\s*("
+			+ namingRegEx + "[\\[\\]]*)";
+	final static String methodRegex = "^\\s*(" + visibilityCharacters + "?)\\s*(" + namingRegEx
+			+ ")\\s*\\((.*)\\)\\s*:\\s*(" + namingRegEx + "[\\[\\]]*)";
+	final static String constructorRegex = "^\\s*(" + visibilityCharacters + "?)\\s*(" + namingRegEx
+			+ ")\\s*\\((.*)\\)";
+	final static String parameterRegex = "^(" + namingRegEx + "[\\[\\]]*)\\s(" + namingRegEx + ")$";
 
 	static List<ClassOrInterfaceUML> allClassesOrInterfaces = new ArrayList<ClassOrInterfaceUML>();
 
@@ -42,8 +46,7 @@ public class ClassOrInterfaceUML {
 	public String uncompiledSignature = "";
 	public List<String> uncompiledAttributes = new ArrayList<String>();
 	public List<String> uncompiledMethods = new ArrayList<String>();
-	
-	
+
 	public static ClassOrInterfaceUML fromDeclaration(ClassOrInterfaceDeclaration cid) {
 		ClassOrInterfaceUML info = new ClassOrInterfaceUML();
 		info.classInfo = cid;
@@ -61,18 +64,18 @@ public class ClassOrInterfaceUML {
 		} else {
 			if (matcher.group(1) != null && matcher.group(1).equals("") == false) {
 				switch (matcher.group(1).charAt(0)) {
-				case '+':
-					info.classInfo.addModifier(Modifier.Keyword.PUBLIC);
-					break;
-				case '#':
-					// "Package Modifier" doesn't exist
-					break;
-				case '~':
-					info.classInfo.addModifier(Modifier.Keyword.PROTECTED);
-					break;
-				case '-':
-					info.classInfo.addModifier(Modifier.Keyword.PRIVATE);
-					break;
+					case '+':
+						info.classInfo.addModifier(Modifier.Keyword.PUBLIC);
+						break;
+					case '#':
+						// "Package Modifier" doesn't exist
+						break;
+					case '~':
+						info.classInfo.addModifier(Modifier.Keyword.PROTECTED);
+						break;
+					case '-':
+						info.classInfo.addModifier(Modifier.Keyword.PRIVATE);
+						break;
 
 				}
 
@@ -176,18 +179,18 @@ public class ClassOrInterfaceUML {
 	public void addExtendedClass(String name) {
 		classInfo.addExtendedType(name);
 	}
-	
+
 	public void addImplementedClass(String name) {
 		classInfo.addImplementedType(name);
 	}
-	
+
 	private ClassOrInterfaceUML() {
 		classInfo = new ClassOrInterfaceDeclaration();
 		allClassesOrInterfaces.add(this);
 	}
 
 	public String getName() {
-		return classInfo.getNameAsString();	
+		return classInfo.getNameAsString();
 	}
 
 	public List<String> getAttributesInUML() {
@@ -200,20 +203,20 @@ public class ClassOrInterfaceUML {
 				str = new StringBuilder("");
 
 				switch (fd.getAccessSpecifier()) {
-				case PRIVATE:
-					str.append("-");
-					break;
-				case PROTECTED:
-					str.append("~");
-					break;
-				case PACKAGE_PRIVATE:
-					str.append("#");
-					break;
-				case PUBLIC:
-					str.append("+");
-					break;
-				default:
-					str.append("#");
+					case PRIVATE:
+						str.append("-");
+						break;
+					case PROTECTED:
+						str.append("~");
+						break;
+					case PACKAGE_PRIVATE:
+						str.append("#");
+						break;
+					case PUBLIC:
+						str.append("+");
+						break;
+					default:
+						str.append("#");
 				}
 				str.append(vd.getNameAsString());
 				str.append(" : ");
@@ -238,20 +241,20 @@ public class ClassOrInterfaceUML {
 			str = new StringBuilder("");
 
 			switch (md.getAccessSpecifier()) {
-			case PRIVATE:
-				str.append("-");
-				break;
-			case PROTECTED:
-				str.append("~");
-				break;
-			case PACKAGE_PRIVATE:
-				str.append("#");
-				break;
-			case PUBLIC:
-				str.append("+");
-				break;
-			default:
-				str.append("#");
+				case PRIVATE:
+					str.append("-");
+					break;
+				case PROTECTED:
+					str.append("~");
+					break;
+				case PACKAGE_PRIVATE:
+					str.append("#");
+					break;
+				case PUBLIC:
+					str.append("+");
+					break;
+				default:
+					str.append("#");
 			}
 			str.append(md.getNameAsString());
 			str.append("(");
@@ -271,7 +274,7 @@ public class ClassOrInterfaceUML {
 			umlMethods.add(str.toString());
 
 		}
-		
+
 		// Combine Constructors and Methods
 		// TODO: differ?
 		List<String> result = getConstructorsInUML();
@@ -311,7 +314,7 @@ public class ClassOrInterfaceUML {
 				str.append(p.toString());
 			}
 			str.append(")");
-			
+
 			umlconstr.add(str.toString());
 		}
 
@@ -333,20 +336,20 @@ public class ClassOrInterfaceUML {
 		StringBuilder str = new StringBuilder("");
 
 		switch (classInfo.getAccessSpecifier()) {
-		case PRIVATE:
-			str.append("-");
-			break;
-		case PROTECTED:
-			str.append("~");
-			break;
-		case PACKAGE_PRIVATE:
-			str.append("#");
-			break;
-		case PUBLIC:
-			str.append("+");
-			break;
-		default:
-			str.append("#");
+			case PRIVATE:
+				str.append("-");
+				break;
+			case PROTECTED:
+				str.append("~");
+				break;
+			case PACKAGE_PRIVATE:
+				str.append("#");
+				break;
+			case PUBLIC:
+				str.append("+");
+				break;
+			default:
+				str.append("#");
 		}
 		str.append(classInfo.getNameAsString());
 		return str.toString();
@@ -373,21 +376,21 @@ public class ClassOrInterfaceUML {
 			Keyword keyword = null;
 			if (visibility != null && visibility.isEmpty() == false) {
 				switch (visibility) {
-				case "+":
-					keyword = (Modifier.Keyword.PUBLIC);
-					break;
-				case "#":
-					// PACKAGE visibility has no modifier
-					break;
-				case "~":
-					keyword = (Modifier.Keyword.PROTECTED);
-					break;
-				case "-":
-					keyword = (Modifier.Keyword.PRIVATE);
-					break;
-				default:
-					// Package visibility
-					break;
+					case "+":
+						keyword = (Modifier.Keyword.PUBLIC);
+						break;
+					case "#":
+						// PACKAGE visibility has no modifier
+						break;
+					case "~":
+						keyword = (Modifier.Keyword.PROTECTED);
+						break;
+					case "-":
+						keyword = (Modifier.Keyword.PRIVATE);
+						break;
+					default:
+						// Package visibility
+						break;
 				}
 			} else {
 				if (matcher.group(1) == null)
@@ -413,31 +416,95 @@ public class ClassOrInterfaceUML {
 		// Throw Exception?
 
 		if (matcher.find() == false) {
-			throw new RegExException(inputString);
+			//Is the Method a Constructor?
+			pattern = Pattern.compile(constructorRegex);
+			matcher = pattern.matcher(inputString);
+			if(matcher.find() == false) {
+				// Neither Method not
+				throw new RegExException(inputString);
+			}
+			
+			String visibility = matcher.group(1);
+			String name = matcher.group(2);
+			String parameters = matcher.group(3);
+			
+			// Constructor must have the same Name as the Class
+			if(name.equals(classInfo.getNameAsString()) == false) {
+				throw new RegExException(inputString + " --> Constructor must have the same Name");
+			}
+			Keyword keyword = null;
+			if (visibility != null && visibility.isEmpty() == false) {
+				switch (visibility) {
+					case "+":
+						keyword = Modifier.Keyword.PUBLIC;
+						break;
+					case "#":
+						// PACKAGE visibility has no modifier
+						break;
+					case "~":
+						keyword = Modifier.Keyword.PROTECTED;
+						break;
+					case "-":
+						keyword = Modifier.Keyword.PRIVATE;
+						break;
+					default:
+						// Package visibility
+						break;
+				}
+			}
+			// Assemble the Constructor
+			ConstructorDeclaration constructor = new ConstructorDeclaration();
+			constructor.setName(name);
+			if(keyword != null) {
+				constructor.setModifiers(keyword);
+			}
+			// Add Parameters or throw Exception
+			Pattern paraPattern = Pattern.compile(parameterRegex);
+			String[] uncheckeParameters = parameters.split(",");
+			for (String p : uncheckeParameters) {
+				if (p.trim().isEmpty())
+					continue;
+				matcher = paraPattern.matcher(p.trim());
+				if (matcher.find() == false) {
+					throw new RegExException("Parameter: " + p);
+				}
+				String ptype = matcher.group(1);
+				String pname = matcher.group(2);
+				constructor.addAndGetParameter(ptype, pname);
+			}
+			classInfo.getMembers().add(constructor);
+			// Finished adding the Constructor.
+			return;
 		}
 
 		String visibility = matcher.group(1);
 		String name = matcher.group(2);
 		String parameters = matcher.group(3);
 		Type returnType = StaticJavaParser.parseType(matcher.group(4));
+		
+		// Methods CAN'T have the same Name as the Class
+		if(name.equals(classInfo.getNameAsString()) == true) {
+			throw new RegExException(inputString + " --> Constructors can't have returntypes"); 
+		}
+		
 		Keyword keyword = null;
 		if (visibility != null && visibility.isEmpty() == false) {
 			switch (visibility) {
-			case "+":
-				keyword = Modifier.Keyword.PUBLIC;
-				break;
-			case "#":
-				// PACKAGE visibility has no modifier
-				break;
-			case "~":
-				keyword = Modifier.Keyword.PROTECTED;
-				break;
-			case "-":
-				keyword = Modifier.Keyword.PRIVATE;
-				break;
-			default:
-				// Package visibility
-				break;
+				case "+":
+					keyword = Modifier.Keyword.PUBLIC;
+					break;
+				case "#":
+					// PACKAGE visibility has no modifier
+					break;
+				case "~":
+					keyword = Modifier.Keyword.PROTECTED;
+					break;
+				case "-":
+					keyword = Modifier.Keyword.PRIVATE;
+					break;
+				default:
+					// Package visibility
+					break;
 			}
 		}
 
@@ -519,7 +586,7 @@ public class ClassOrInterfaceUML {
 	public ClassOrInterfaceUML clone() {
 		return fromDeclaration(classInfo.clone());
 	}
-	
+
 	public static class RegExException extends RuntimeException {
 		public RegExException(String message) {
 			super("Regular Expression Error: " + message);

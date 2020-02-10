@@ -372,7 +372,6 @@ public class ClassObject extends Shape {
 
 	@Override
 	public void delete(Shape source) {
-		System.out.println("delete class");
 		// Deletion starts from here
 		if(source == null) {
 			Canvas.getInstance().removeShape(this);
@@ -500,10 +499,6 @@ public class ClassObject extends Shape {
 			acceptButt.addActionListener(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					System.out.println("Text Eingelesen:");
-					System.out.println(nameField.getText());
-					System.out.println(attArea.getText());
-					System.out.println(methArea.getText());
 					ClassOrInterfaceUML newInfo = null;
 					try {
 						//obj.uncompiledSignature = "";
@@ -541,7 +536,8 @@ public class ClassObject extends Shape {
 					obj.umlInfo = newInfo;
 					//obj.uncompiledAttributes = uncompiledAttributes;
 					//obj.uncompiledMethods = uncompiledMethods;
-					Canvas.getInstance().remove(outerPanel);
+					//Canvas.getInstance().remove(outerPanel);
+					Canvas.getInstance().cancelEditing();
 					obj.update();
 					Canvas.getInstance().repaint();
 				}
@@ -551,8 +547,7 @@ public class ClassObject extends Shape {
 			cancelButt.addActionListener(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					System.out.println("Canceling Edit");
-					Canvas.getInstance().remove(outerPanel);
+					Canvas.getInstance().cancelEditing();
 					Canvas.getInstance().repaint();
 				}
 			});
