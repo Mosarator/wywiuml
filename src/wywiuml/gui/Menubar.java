@@ -1,9 +1,11 @@
 package wywiuml.gui;
 
 import java.awt.event.ActionEvent;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -21,8 +23,12 @@ import javax.swing.JOptionPane;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 import wywiuml.parsing.Parser;
+import wywiuml.shapes.Association;
 import wywiuml.shapes.ClassObject;
 import wywiuml.shapes.Generalization;
+import wywiuml.shapes.Line;
+import wywiuml.shapes.Shape;
+import wywiuml.shapes.Shape.ShapeType;
 import wywiuml.structures.ClassOrInterfaceUML;
 
 @SuppressWarnings("serial")
@@ -53,7 +59,7 @@ public class Menubar extends JMenuBar {
 				JFileChooser chooser = new JFileChooser(filepath);
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int choice = chooser.showOpenDialog(null);
-				if (choice == ABORT) {
+				if (choice != JFileChooser.APPROVE_OPTION) {
 					// early exit
 					return;
 				}
@@ -147,41 +153,109 @@ public class Menubar extends JMenuBar {
 				JFileChooser chooser = new JFileChooser(filepath);
 				int choice = chooser.showSaveDialog(null);
 				switch (choice) {
-				case JFileChooser.APPROVE_OPTION:
-					try {
-						lastPath = chooser.getSelectedFile().getParent();
-						File outputfile = new File(chooser.getSelectedFile() + ".png");
-						ImageIO.write(Canvas.getInstance().createImage(), "png", outputfile);
-					} catch (Exception error) {
-					}
-					break;
-				default:
-					// do nothing
-					break;
+					case JFileChooser.APPROVE_OPTION:
+						try {
+							lastPath = chooser.getSelectedFile().getParent();
+							File outputfile = new File(chooser.getSelectedFile() + ".png");
+							ImageIO.write(Canvas.getInstance().createImage(), "png", outputfile);
+						} catch (Exception error) {
+						}
+						break;
+					default:
+						// do nothing
+						break;
 				}
 			}
 		});
 		export.add(exportImg);
 
-		JMenuItem exportProject = new JMenuItem(new AbstractAction("...als .JAVA") {
+		JMenuItem exportProject = new JMenuItem(new AbstractAction("...als Java Project") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser(System.getProperty("user.home"));
+				Canvas canvas = Canvas.getInstance();
+
+				// Fetch all ClassObjects
+				List<ClassObject> classobjects = new ArrayList<ClassObject>();
+				for (Shape s : canvas.getShapes()) {
+					if (s.getShapeType() == ShapeType.CLASS) {
+						classobjects.add((ClassObject) s);
+					}
+				}
+				
+				// Create copies for later
+				List<ClassOrInterfaceUML> cloneInfos = new ArrayList<ClassOrInterfaceUML>();
+				for(ClassObject obj : classobjects) {
+					cloneInfos.add(obj.getUMLInfo().clone());
+				}
+				
+				// implement Generalizations and associations
+				for (Shape s : canvas.getShapes()) {
+
+					ClassObject from;
+					ClassObject to;
+					switch(s.getShapeType()) {
+						case GENERALIZATION:
+						case REALIZATION:
+							Generalization g = (Generalization) s;
+							from = (ClassObject) (g.startPoint.getConnectedShape());
+							to = (ClassObject) (g.endPoint.getConnectedShape());
+							if(g.getShapeType() == ShapeType.GENERALIZATION) {
+								from.getUMLInfo().addExtendedClass(to.getUMLInfo().getName());
+							}else {
+								from.getUMLInfo().addImplementedClass(to.getUMLInfo().getName());
+							}
+							break;
+						case ASSOCIATON:
+						case AGGREGATION:
+						case COMPOSITION:
+							Association a = (Association) s;
+							from = (ClassObject) (a.startPoint.getConnectedShape());
+							to = (ClassObject) (a.endPoint.getConnectedShape());
+							from.getUMLInfo().addAttributeFromUMLString(a.getVariable() + ":" + to.getUMLInfo().getName());
+							break;
+						default:
+								break;
+					}
+				}
+				
+
+				String filepath;
+				if (lastPath.isEmpty()) {
+					filepath = System.getProperty("user.home");
+				} else {
+					filepath = lastPath;
+				}
+
+				JFileChooser chooser = new JFileChooser(filepath);
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int choice = chooser.showSaveDialog(null);
 				switch (choice) {
-				case JFileChooser.APPROVE_OPTION:
-					try {
-						File outputfile = new File(chooser.getSelectedFile() + ".png");
-						ImageIO.write(Canvas.getInstance().createImage(), "png", outputfile);
-					} catch (Exception error) {
-					}
-					break;
-				default:
-					// do nothing
-					break;
+					case JFileChooser.APPROVE_OPTION:
+						lastPath = filepath;
+						for (ClassObject obj : classobjects) {
+							try {
+								filepath = chooser.getSelectedFile().getAbsolutePath() + "/" + obj.getUMLInfo().getName() + ".java";
+								File outputfile = new File(filepath);
+								BufferedWriter writer = new BufferedWriter(new FileWriter(outputfile));
+								writer.write(obj.getUMLInfo().toCode());
+								writer.close();
+							} catch (Exception error) {
+								JOptionPane.showMessageDialog(null,
+										"Problem while writing in File: " + obj.getUMLInfo().getName() + ".java");		
+							}
+						}
+					default:
+						// do nothing
+						break;
+				}
+				
+				// Reset the ClassInformations
+				for(int i= 0; i< classobjects.size(); i++) {
+					classobjects.get(i).setUMLInfo(cloneInfos.get(i));
 				}
 			}
 		});
+		export.add(exportProject);
 
 		JMenuItem saveAsUML = new JMenuItem(new AbstractAction("Speichern als UML") {
 			@Override
@@ -189,22 +263,26 @@ public class Menubar extends JMenuBar {
 				JFileChooser chooser = new JFileChooser(System.getProperty("user.home"));
 				int choice = chooser.showSaveDialog(null);
 				switch (choice) {
-				case JFileChooser.APPROVE_OPTION:
-					try {
-						FileOutputStream outFile = new FileOutputStream(chooser.getSelectedFile() + ".uml");
-						ObjectOutputStream out = new ObjectOutputStream(outFile);
-						out.writeObject(Canvas.getInstance().getSaveState());
-						System.out.println("speichern erfolgreich");
-						out.close();
-						outFile.close();
+					case JFileChooser.APPROVE_OPTION:
+						try {
+							File file = chooser.getSelectedFile();
+							if (file.getAbsolutePath().endsWith(".uml") == false) {
+								file = new File(chooser.getSelectedFile() + ".uml");
+							}
+							FileOutputStream outFile = new FileOutputStream(file);
+							ObjectOutputStream out = new ObjectOutputStream(outFile);
+							out.writeObject(Canvas.getInstance().getSaveState());
+							System.out.println("speichern erfolgreich");
+							out.close();
+							outFile.close();
 
-					} catch (Exception error) {
-						System.out.println(error.getMessage());
-					}
-					break;
-				default:
-					// do nothing
-					break;
+						} catch (Exception error) {
+							System.out.println(error.getMessage());
+						}
+						break;
+					default:
+						// do nothing
+						break;
 				}
 			}
 		});
@@ -216,23 +294,23 @@ public class Menubar extends JMenuBar {
 				JFileChooser chooser = new JFileChooser(System.getProperty("user.home"));
 				int choice = chooser.showOpenDialog(null);
 				switch (choice) {
-				case JFileChooser.APPROVE_OPTION:
-					try {
-						FileInputStream inFile = new FileInputStream(chooser.getSelectedFile());
-						ObjectInputStream in = new ObjectInputStream(inFile);
-						System.out.println("Laden initialisieren");
-						Canvas.getInstance().readSaveState((Serializable) in.readObject());
-						System.out.println("Laden erfolgreich");
-						in.close();
-						inFile.close();
-						Canvas.getInstance().repaint();
-					} catch (Exception error) {
-						System.out.println(error.getMessage());
-					}
-					break;
-				default:
-					// do nothing
-					break;
+					case JFileChooser.APPROVE_OPTION:
+						try {
+							FileInputStream inFile = new FileInputStream(chooser.getSelectedFile());
+							ObjectInputStream in = new ObjectInputStream(inFile);
+							System.out.println("Laden initialisieren");
+							Canvas.getInstance().readSaveState((Serializable) in.readObject());
+							System.out.println("Laden erfolgreich");
+							in.close();
+							inFile.close();
+							Canvas.getInstance().repaint();
+						} catch (Exception error) {
+							System.out.println(error.getMessage());
+						}
+						break;
+					default:
+						// do nothing
+						break;
 				}
 			}
 		});

@@ -29,10 +29,8 @@ public class CreateAssociationMode extends MouseMode {
 	public void mousePressed(MouseEvent e) {
 		System.out.println("pressed");
 		startP = e.getPoint();
-		Shape obj = canvas.getShapeAt(e.getPoint());
+		Shape obj = canvas.getShapeAt(e.getPoint(),ShapeType.CLASS);
 		if (obj == null)
-			return;
-		if(obj.getShapeType()!=ShapeType.CLASS)
 			return;
 		lastPos = startP;
 		currentLine = new Association(false, startP, startP);
@@ -52,8 +50,8 @@ public class CreateAssociationMode extends MouseMode {
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Shape from = canvas.getShapeAt(startP);
-		Shape to = canvas.getShapeAt(e.getPoint());
+		Shape from = canvas.getShapeAt(startP, ShapeType.CLASS);
+		Shape to = canvas.getShapeAt(e.getPoint(), ShapeType.CLASS);
 		if (from == null || to == null || from == to) {
 			// no valid connection
 			canvas.removeObject(currentLine);

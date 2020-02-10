@@ -14,8 +14,10 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import wywiuml.mouseMode.CancelMode;
 import wywiuml.mouseMode.MouseMode;
 import wywiuml.mouseMode.SelectAndEditMode;
+import wywiuml.shapes.Association;
 import wywiuml.shapes.ClassObject;
 import wywiuml.shapes.Generalization;
 import wywiuml.shapes.Shape;
@@ -31,7 +33,7 @@ public class Canvas extends JPanel {
 
 	private List<Shape> shapes = new ArrayList<Shape>();
 	private MouseMode currentMode;
-	private MouseMode defaultMode = SelectAndEditMode.getInstance();
+	private MouseMode lastMode = SelectAndEditMode.getInstance();
 	private boolean isEditing;
 
 	public Shape selected;
@@ -60,7 +62,7 @@ public class Canvas extends JPanel {
 		super();
 		setLayout(null);
 		setBackground(BACKGROUND);
-		setMouseMode(defaultMode);
+		setMouseMode(lastMode);
 	}
 
 	@Override
@@ -107,6 +109,10 @@ public class Canvas extends JPanel {
 	}
 
 	public void setIsEditing(boolean b) {
+		if(b) {
+			lastMode = currentMode;
+			setMouseMode(new CancelMode());
+		}
 		isEditing = b;
 	}
 
@@ -115,7 +121,7 @@ public class Canvas extends JPanel {
 			removeAll();
 			isEditing = false;
 			repaint();
-			setMouseMode(defaultMode);
+			setMouseMode(lastMode);
 		}
 	}
 
@@ -173,6 +179,13 @@ public class Canvas extends JPanel {
 					Generalization umlGeneralization = new Generalization();
 					umlGeneralization.readSaveState(s);
 					addShape(umlGeneralization);
+					break;
+				case AGGREGATION:
+				case COMPOSITION:
+				case ASSOCIATON:
+					Association umlAssociation = new Association();
+					umlAssociation.readSaveState(s);
+					addShape(umlAssociation);
 					break;
 				case ANCHOR:
 					// Do what?

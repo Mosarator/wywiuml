@@ -1,9 +1,12 @@
 package wywiuml.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -40,6 +43,7 @@ public class Toolbar extends JPanel {
 		add(associationButton);
 		
 		defaultButton = selectButton;
+		defaultButton.doClick();
 		CancelMode.setToolbar(this);
 	}
 	
@@ -48,21 +52,27 @@ public class Toolbar extends JPanel {
 	}
 
 	private static class ToolButton extends JButton {
+		static ToolButton lastActive;
 		MouseMode mode = null;
 		//TODO make buttons prettier
 		private ToolButton(ImageIcon icon, MouseMode pMode) {
+			ToolButton thisButton = this;	
 			mode = pMode;
 			setIcon(icon);
 			setBackground(Color.BLACK);
+			setToolTipText(pMode.getDescription());
 			setPreferredSize(new Dimension(20,20));
 			Canvas canvas = Canvas.getInstance();
 			
 			addActionListener(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if(lastActive != null)
+						lastActive.resetColor();
+					lastActive = thisButton;
+					canvas.cancelEditing();
 					setBackground(Color.BLUE);
 					canvas.setMouseMode(mode);
-					canvas.cancelEditing();
 					canvas.repaint();
 				}
 			});

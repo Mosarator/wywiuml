@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import wywiuml.gui.Canvas;
 import wywiuml.shapes.AnchorPoint;
+import wywiuml.shapes.Association;
 import wywiuml.shapes.ClassObject;
 import wywiuml.shapes.Generalization;
 import wywiuml.shapes.Shape;
@@ -77,14 +78,23 @@ public class SelectAndEditMode extends MouseMode {
 		if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
 			System.out.println("Double Click!");
 			Shape obj = canvas.getShapeAt(e.getPoint());
-			if (obj != null && obj.getShapeType() == ShapeType.CLASS) {
-				JPanel editWindow = ((ClassObject) obj).getEditWindow();
-				editWindow.setVisible(false);
-				canvas.add(editWindow);
-				editWindow.setVisible(true);
-				canvas.setIsEditing(true);
-				canvas.setMouseMode(new CancelMode());
+			if(obj == null)
+				return;
+			JPanel editWindow= null;
+			if (obj.getShapeType() == ShapeType.CLASS) {
+				editWindow = ((ClassObject) obj).getEditWindow();
 			}
+			if(obj.getShapeType() == ShapeType.ASSOCIATON ||
+					obj.getShapeType() == ShapeType.AGGREGATION ||
+					obj.getShapeType() == ShapeType.COMPOSITION
+					) {
+				editWindow = ((Association) obj).getEditWindow();
+			}
+			editWindow.setVisible(false);
+			canvas.add(editWindow);
+			editWindow.setVisible(true);
+			canvas.setIsEditing(true);
+			
 		} else if (SwingUtilities.isLeftMouseButton(e)) {
 
 		} else if (SwingUtilities.isRightMouseButton(e)) {

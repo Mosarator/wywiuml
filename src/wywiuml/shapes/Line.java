@@ -41,7 +41,7 @@ public abstract class Line extends Shape {
 
 	@Override
 	public boolean isInside(Point p) {
-		return isInside(p, 5);
+		return isInside(p, 2);
 	}
 	
 	public boolean isInside(Point p, int tolerance) {
@@ -99,7 +99,15 @@ public abstract class Line extends Shape {
 			start = s;
 			end = e;
 		}
+		
+		public AnchorPoint getStartAnchor() {
+			return start;
+		}
 
+		public AnchorPoint getEndAnchor() {
+			return end;
+		}
+		
 		LineSegment[] split() {
 			LineSegment[] split = new LineSegment[2];
 			Point middle = new Point(((start.getX() + end.getX()) / 2), ((start.getY() + end.getY()) / 2));
@@ -108,6 +116,8 @@ public abstract class Line extends Shape {
 			split[1] = new LineSegment(middlePoint, end);
 			return split;
 		}
+		
+		
 
 		public boolean isInside(Point p, int tolerance) {
 			// Distance funkction from stackoverflow post:

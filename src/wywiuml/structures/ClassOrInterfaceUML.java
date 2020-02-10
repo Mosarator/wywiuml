@@ -1,13 +1,10 @@
 package wywiuml.structures;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.SpecialAction;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.Modifier;
@@ -42,8 +39,12 @@ public class ClassOrInterfaceUML {
 	static List<ClassOrInterfaceUML> allClassesOrInterfaces = new ArrayList<ClassOrInterfaceUML>();
 
 	ClassOrInterfaceDeclaration classInfo;
-	//List<UMLLine> umlLines = new ArrayList<UMLLine>();
 
+	public String uncompiledSignature = "";
+	public List<String> uncompiledAttributes = new ArrayList<String>();
+	public List<String> uncompiledMethods = new ArrayList<String>();
+	
+	
 	public static ClassOrInterfaceUML fromDeclaration(ClassOrInterfaceDeclaration cid) {
 		ClassOrInterfaceUML info = new ClassOrInterfaceUML();
 		info.classInfo = cid;
@@ -133,7 +134,6 @@ public class ClassOrInterfaceUML {
 	}
 
 	public static boolean removeFromList(ClassOrInterfaceUML uci) {
-		// TODO check for UMLLines?
 		return allClassesOrInterfaces.remove(uci);
 	}
 
@@ -151,7 +151,6 @@ public class ClassOrInterfaceUML {
 
 	public List<ClassOrInterfaceUML> getExtendedClasses() {
 		List<ClassOrInterfaceUML> extClasses = new ArrayList<ClassOrInterfaceUML>();
-
 		for (ClassOrInterfaceType type : classInfo.getExtendedTypes()) {
 			for (ClassOrInterfaceUML uc : allClassesOrInterfaces) {
 				if (type.getNameAsString().equals(uc.classInfo.getNameAsString())) {
@@ -175,31 +174,21 @@ public class ClassOrInterfaceUML {
 		return impClasses;
 	}
 
+	public void addExtendedClass(String name) {
+		classInfo.addExtendedType(name);
+	}
+	
+	public void addImplementedClass(String name) {
+		classInfo.addImplementedType(name);
+	}
+	
 	private ClassOrInterfaceUML() {
 		classInfo = new ClassOrInterfaceDeclaration();
 		allClassesOrInterfaces.add(this);
 	}
 
-	public String getNameInUML() {
-		StringBuilder str = new StringBuilder("");
-		boolean hasVisibilityModifier = false;
-		for (Modifier m : classInfo.getModifiers()) {
-			if (m.getKeyword() == Modifier.Keyword.PRIVATE) {
-				str.append("-");
-				hasVisibilityModifier = true;
-			} else if (m.getKeyword() == Modifier.Keyword.PROTECTED) {
-				str.append("~");
-				hasVisibilityModifier = true;
-			} else if (m.getKeyword() == Modifier.Keyword.PUBLIC) {
-				str.append("+");
-				hasVisibilityModifier = true;
-			}
-		}
-		if (hasVisibilityModifier == false) {
-			str.append("#");
-		}
-		str.append(classInfo.getNameAsString());
-		return str.toString();
+	public String getName() {
+		return classInfo.getNameAsString();	
 	}
 
 	public List<String> getAttributesInUML() {
@@ -484,14 +473,16 @@ public class ClassOrInterfaceUML {
 		}
 	}
 
-	@SuppressWarnings("serial")
+	public ClassOrInterfaceUML clone() {
+		return fromDeclaration(classInfo.clone());
+	}
+	
 	public static class RegExException extends RuntimeException {
 		public RegExException(String message) {
 			super("Regular Expression Error: " + message);
 		}
 	}
 
-	@SuppressWarnings("serial")
 	public static class DuplicateException extends RuntimeException {
 		public DuplicateException(String message) {
 			super("Duplication Error: " + message);

@@ -36,7 +36,6 @@ public class AnchorPoint extends Shape {
 
 	@Override
 	public void delete(Shape source) {
-		System.out.println("delete Anchor");
 		if(source == null) {
 			//TODO
 			return;

@@ -30,7 +30,7 @@ public class ClassObject extends Shape {
 	/**
 	 * Default Values
 	 */
-	private static final Dimension DIMENSION = new Dimension(80, 50);
+	private static final Dimension DIMENSION = new Dimension(100, 150);
 	private static final int linespacing = 5;
 	private static final int topspacing = 5;
 	private static final int leftspacing = 10;
@@ -40,14 +40,11 @@ public class ClassObject extends Shape {
 	private static final Color CLR_BG = Color.WHITE;
 	private static final Color CLR_TEXT = Color.BLACK;
 	private static final Color CLR_ERRORTEXT = Color.RED;
-	private static final Color CLR_HIGHLIGHTED = Color.RED;
+	//private static final Color CLR_HIGHLIGHTED = Color.RED;
 
 	private ClassOrInterfaceUML umlInfo;
 	private boolean isInterface;
 	private boolean isAbstract;
-	private String uncompiledSignature = "";
-	private List<String> uncompiledAttributes = new ArrayList<String>();
-	private List<String> uncompiledMethods = new ArrayList<String>();
 	private List<AnchorPoint> anchors = new ArrayList<AnchorPoint>();
 	
 
@@ -55,8 +52,8 @@ public class ClassObject extends Shape {
 		// TODO: fromCode
 		ClassObject obj = new ClassObject(0,0);
 		obj.umlInfo = info;
-		obj.isInterface = info.isInterface();
-		obj.isAbstract = info.isAbstract();
+		obj.setInterface(info.isInterface());
+		obj.setAbstract(info.isAbstract());
 		obj.recalculateSize(Canvas.getInstance().getFontMetrics(BASICFONT));
 		return obj;
 	}
@@ -144,9 +141,9 @@ public class ClassObject extends Shape {
 		}
 
 		String signature = "";
-		if (uncompiledSignature.length() > 0) {
+		if (umlInfo.uncompiledSignature.length() > 0) {
 			g.setColor(CLR_ERRORTEXT);
-			signature = uncompiledSignature;
+			signature = umlInfo.uncompiledSignature;
 		} else {
 			signature = umlInfo.getSignature();
 		}
@@ -175,7 +172,7 @@ public class ClassObject extends Shape {
 		}
 		// Jetzt die mit Fehlern
 		g.setColor(CLR_ERRORTEXT);
-		for (String s : uncompiledAttributes) {
+		for (String s : umlInfo.uncompiledAttributes) {
 			g.drawString(s, pos.x + leftspacing, pos.y + lastHeight + linespacing + textHeight);
 			lastHeight += (linespacing + textHeight);
 		}
@@ -194,7 +191,7 @@ public class ClassObject extends Shape {
 		}
 		// Die fehlerhaften
 		g.setColor(CLR_ERRORTEXT);
-		for (String s : uncompiledMethods) {
+		for (String s : umlInfo.uncompiledMethods) {
 			g.drawString(s, pos.x + leftspacing, pos.y + lastHeight + linespacing + textHeight);
 			lastHeight += (linespacing + textHeight);
 		}
@@ -224,7 +221,11 @@ public class ClassObject extends Shape {
 		return umlInfo;
 	}
 	
-	private void setDefaultUmlInfo() {
+	public void setUMLInfo(ClassOrInterfaceUML info) {
+		umlInfo = info;
+	}
+	
+ 	private void setDefaultUmlInfo() {
 		int number = 0;
 		String className = null;
 		do {
@@ -235,7 +236,7 @@ public class ClassObject extends Shape {
 		} while (className == null);
 
 		this.umlInfo = ClassOrInterfaceUML.quickCreate("+" + className);
-		this.isInterface = false;
+		//this.isInterface = false;
 	}
 
 	private void recalculateSize(FontMetrics metrics) {
@@ -243,10 +244,10 @@ public class ClassObject extends Shape {
 		int newHeight = DIMENSION.height;
 		List<String> attributes = new ArrayList<String>();
 		attributes.addAll(umlInfo.getAttributesInUML());
-		attributes.addAll(uncompiledAttributes);
+		attributes.addAll(umlInfo.uncompiledAttributes);
 		List<String> methods = new ArrayList<String>();
 		methods.addAll(umlInfo.getMethodsInUML());
-		methods.addAll(uncompiledMethods);
+		methods.addAll(umlInfo.uncompiledMethods);
 		int headlines = 1;
 		if (isInterface)
 			headlines = 2;
@@ -263,8 +264,8 @@ public class ClassObject extends Shape {
 				newWidth = Math.max(newWidth, metrics.stringWidth(attributes.get(i)));
 			}
 		String signature = "";
-		if (uncompiledSignature.length() > 0) {
-			signature = uncompiledSignature;
+		if (umlInfo.uncompiledSignature.length() > 0) {
+			signature = umlInfo.uncompiledSignature;
 		} else {
 			signature = umlInfo.getSignature();
 		}
@@ -280,6 +281,7 @@ public class ClassObject extends Shape {
 
 	public void setInterface(boolean isInterface) {
 		this.isInterface = isInterface;
+		umlInfo.setIsInterface(isInterface);
 	}
 
 	@Override
@@ -313,6 +315,7 @@ public class ClassObject extends Shape {
 
 	public void setAbstract(boolean isAbstract) {
 		this.isAbstract = isAbstract;
+		umlInfo.setIsAbstract(isAbstract);
 	}
 
 	@Override
@@ -329,35 +332,37 @@ public class ClassObject extends Shape {
 		pos.y = ss.posy;
 		dim.height = ss.height;
 		dim.width = ss.width;
-		isAbstract = ss.isAbstract;
-		isInterface = ss.isInterface;
+		setAbstract(ss.isAbstract);
+		setInterface(ss.isInterface);
+		//isAbstract = ss.isAbstract;
+		//isInterface = ss.isInterface;
 		ClassOrInterfaceUML newInfo;
 		
 		try {
-			uncompiledSignature = "";
 			newInfo = ClassOrInterfaceUML.quickCreate(ss.signature);
+			newInfo.uncompiledSignature = "";
 		} catch (Exception error) {
 			newInfo = ClassOrInterfaceUML.quickCreate("+ ErrorClass");
-			uncompiledSignature = ss.signature;
+			newInfo.uncompiledSignature = ss.signature;
 		}
 
-		uncompiledAttributes.clear();
+		newInfo.uncompiledAttributes.clear();
 		for (String att : ss.attributes) {
 			try {
 				newInfo.addAttributeFromUMLString(att);
 			} catch (Exception error) {
 				if (!att.trim().isEmpty())
-					uncompiledAttributes.add(att);
+					newInfo.uncompiledAttributes.add(att);
 			}
 		}
-		uncompiledAttributes.clear();
+		newInfo.uncompiledAttributes.clear();
 		for (String meth : ss.methods) {
 			try {
 				newInfo.addMethodFromUMLString(meth);
 			} catch (Exception error) {
 				System.out.println("ERROR: " + error.getMessage());
 				if (!meth.trim().isEmpty())
-					uncompiledMethods.add(meth);
+					newInfo.uncompiledMethods.add(meth);
 			}
 		}
 		ClassOrInterfaceUML.removeFromList(umlInfo);
@@ -411,13 +416,21 @@ public class ClassObject extends Shape {
 			}) {
 			});
 			
-			add(new JMenuItem(new AbstractAction("L�schen") {
+			add(new JMenuItem(new AbstractAction("L\u00f6schen") {
 				public void actionPerformed(ActionEvent e) {
 					umlclass.delete(null);
 					canvas.repaint();
 				}
 			}) {
 			});
+
+			add(new JMenuItem(new AbstractAction("Print Code to Console") {
+				public void actionPerformed(ActionEvent e) {
+					System.out.println(umlclass.umlInfo.toCode());
+				}
+			}) {
+			});
+			
 			
 		}
 
@@ -432,7 +445,7 @@ public class ClassObject extends Shape {
 		private JButton cancelButt;
 		private JPanel infoPanel;
 		private JPanel buttPanel;
-		private int padding;
+		private int padding = 0;
 
 		private EditWindow(ClassObject obj) {
 			super();
@@ -440,17 +453,17 @@ public class ClassObject extends Shape {
 			Color bg = Color.BLACK;
 			List<String> attributes = new ArrayList<String>();
 			attributes.addAll(obj.umlInfo.getAttributesInUML());
-			attributes.addAll(obj.uncompiledAttributes);
+			attributes.addAll(obj.umlInfo.uncompiledAttributes);
 			List<String> methods = new ArrayList<String>();
 			methods.addAll(obj.umlInfo.getMethodsInUML());
-			methods.addAll(obj.uncompiledMethods);
+			methods.addAll(obj.umlInfo.uncompiledMethods);
 			JPanel outerPanel = this;
 			StringBuilder str = new StringBuilder("");
 
 			setBackground(bg);
 			setLayout(new BorderLayout());
-			if (obj.uncompiledSignature.length() > 0) {
-				nameField = new JTextField(obj.uncompiledSignature);
+			if (obj.umlInfo.uncompiledSignature.length() > 0) {
+				nameField = new JTextField(obj.umlInfo.uncompiledSignature);
 			} else {
 				nameField = new JTextField(obj.umlInfo.getSignature());
 			}
@@ -493,24 +506,27 @@ public class ClassObject extends Shape {
 					System.out.println(methArea.getText());
 					ClassOrInterfaceUML newInfo = null;
 					try {
-						obj.uncompiledSignature = "";
+						//obj.uncompiledSignature = "";
 						newInfo = ClassOrInterfaceUML.quickCreate(nameField.getText());
+						newInfo.uncompiledSignature = "";
 					} catch (Exception error) {
 						newInfo = ClassOrInterfaceUML.quickCreate("+ ErrorClass");
-						obj.uncompiledSignature = nameField.getText();
+						newInfo.uncompiledSignature = nameField.getText();
 					}
-					List<String> uncompiledAttributes = new ArrayList<String>();
+					newInfo.setIsAbstract(obj.isAbstract);
+					newInfo.setIsInterface(obj.isInterface);
+					//List<String> uncompiledAttributes = new ArrayList<String>();
 					String[] lines = attArea.getText().split("\r?\n");
 					for (String line : lines) {
 						try {
 							newInfo.addAttributeFromUMLString(line);
 						} catch (Exception error) {
 							if (!line.trim().isEmpty())
-								uncompiledAttributes.add(line);
+								newInfo.uncompiledAttributes.add(line);
 						}
 					}
 
-					List<String> uncompiledMethods = new ArrayList<String>();
+					//List<String> uncompiledMethods = new ArrayList<String>();
 					lines = methArea.getText().split("\r?\n");
 					for (String line : lines) {
 						try {
@@ -518,13 +534,13 @@ public class ClassObject extends Shape {
 						} catch (Exception error) {
 							System.out.println("ERROR: " + error.getMessage());
 							if (!line.trim().isEmpty())
-								uncompiledMethods.add(line);
+								newInfo.uncompiledMethods.add(line);
 						}
 					}
 					ClassOrInterfaceUML.removeFromList(obj.umlInfo);
 					obj.umlInfo = newInfo;
-					obj.uncompiledAttributes = uncompiledAttributes;
-					obj.uncompiledMethods = uncompiledMethods;
+					//obj.uncompiledAttributes = uncompiledAttributes;
+					//obj.uncompiledMethods = uncompiledMethods;
 					Canvas.getInstance().remove(outerPanel);
 					obj.update();
 					Canvas.getInstance().repaint();
@@ -569,17 +585,17 @@ public class ClassObject extends Shape {
 			type = ShapeType.CLASS;
 			isInterface = obj.isInterface;
 			isAbstract = obj.isAbstract;
-			if (obj.uncompiledSignature.length() > 0)
-				signature = obj.uncompiledSignature;
+			if (obj.umlInfo.uncompiledSignature.length() > 0)
+				signature = obj.umlInfo.uncompiledSignature;
 			else
 				signature = obj.umlInfo.getSignature();
 
 			List<String> umlAtts = obj.umlInfo.getAttributesInUML();
-			List<String> umlwrongAtts = obj.uncompiledAttributes;
+			List<String> umlwrongAtts = obj.umlInfo.uncompiledAttributes;
 			attributes = new String[umlAtts.size() + umlwrongAtts.size()];
 
 			List<String> umlMeths = obj.umlInfo.getMethodsInUML();
-			List<String> umlwrongMeths = obj.uncompiledMethods;
+			List<String> umlwrongMeths = obj.umlInfo.uncompiledMethods;
 			methods = new String[umlMeths.size() + umlwrongMeths.size()];
 
 			for (int i = 0; i < umlAtts.size(); i++) {

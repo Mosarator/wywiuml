@@ -22,9 +22,7 @@ public class Generalization extends Line {
 
 	private static final int ARROWWIDTH = 10;
 	private static final int ARROWHEIGHT = 10;
-	//private Point startP, endP;
-	//private AnchorPoint start, end;
-
+	
 	public Generalization() {
 		this(false);
 	}
@@ -169,7 +167,7 @@ public class Generalization extends Line {
 
 		startP = new Point(state.startX,state.startY);
 		endP = new Point(state.endX, state.endY);
-		complete(Canvas.getInstance().getShapeAt(startP), Canvas.getInstance().getShapeAt(endP));
+		complete(Canvas.getInstance().getShapeAt(startP, ShapeType.CLASS), Canvas.getInstance().getShapeAt(endP, ShapeType.CLASS));
 		return true;
 	}
 
