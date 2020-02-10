@@ -12,6 +12,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitor;
@@ -31,16 +32,6 @@ public class Parser {
             return name.contains(".java");
         }
     };
-
-   /* public static void main(String[] args) {
-        // System.out.println("path =" + System.getProperty("user.dir"));
-        List<ClassOrInterfaceDeclaration> parsedClasses = parseClassesFromProjectPath(testdirPath);
-        // System.out.println("classes parsed: " + parsedClasses.size());
-        for (ClassOrInterfaceDeclaration parsedClass : parsedClasses) {
-            // System.out.println(parsedClass.toString());
-            System.out.println("\r\n");
-        }
-    }*/
 
     // =================================================
 
@@ -107,6 +98,17 @@ public class Parser {
 
         return methodList;
     }
+    
+    public static List<ConstructorDeclaration> getConstructors(ClassOrInterfaceDeclaration cid){
+    	
+    	 List<ConstructorDeclaration> constructorList = new ArrayList<ConstructorDeclaration>();
+    	 ConstructorCollector constructorCollector = new ConstructorCollector();
+    	 constructorCollector.setContext(cid);
+    	 constructorCollector.visit(cid, constructorList);
+
+         return constructorList;
+    	
+    }
 
     @SuppressWarnings("rawtypes")
 	public static void sort(ClassOrInterfaceDeclaration cid) {
@@ -161,6 +163,26 @@ public class Parser {
             list.add(cid);
         }
     }
+    
+    private static class ConstructorCollector extends VoidVisitorAdapter<List<ConstructorDeclaration>>{
+    	 
+    	private ClassOrInterfaceDeclaration contextClass;
+
+        public void setContext(ClassOrInterfaceDeclaration cid) {
+        	contextClass = cid;
+        }	
+        
+        @Override
+        public void visit(ConstructorDeclaration cd, List<ConstructorDeclaration> output) {
+        	// TODO Auto-generated method stub
+        	super.visit(cd, output);
+        	if (cd.getParentNode().get() == contextClass) {
+                output.add(cd);
+            }
+        }
+    	
+    }
+    
 
     private static class MethodCollector extends VoidVisitorAdapter<List<MethodDeclaration>> {
 
