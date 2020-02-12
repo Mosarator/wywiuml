@@ -128,11 +128,16 @@ public class ClassObject extends Shape {
 		if (umlInfo == null)
 			return;
 
-		if (isInterface && isAbstract) {
+		/**
+		 * if (isInterface && isAbstract) {
 			g.setColor(CLR_ERRORTEXT);
 		} else {
 			g.setColor(CLR_TEXT);
 		}
+		Interface CAN be abstract, but it's useless
+		**/
+		
+		g.setColor(CLR_TEXT);
 
 		if (isInterface) {
 			g.drawString("<<interface>>", pos.x + (dim.width - metrics.stringWidth("<<interface>>")) / 2,
