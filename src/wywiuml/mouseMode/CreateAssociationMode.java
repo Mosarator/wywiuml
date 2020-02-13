@@ -3,8 +3,12 @@ package wywiuml.mouseMode;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
 import wywiuml.gui.Canvas;
 import wywiuml.shapes.Association;
+import wywiuml.shapes.ClassObject;
 import wywiuml.shapes.Generalization;
 import wywiuml.shapes.Shape;
 import wywiuml.shapes.Shape.ShapeType;
@@ -60,6 +64,28 @@ public class CreateAssociationMode extends MouseMode {
 		}
 		currentLine = null;
 		canvas.repaint();
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		Canvas canvas = Canvas.getInstance();
+		if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+			Shape obj = canvas.getShapeAt(e.getPoint(), ShapeType.ASSOCIATON, ShapeType.AGGREGATION, ShapeType.COMPOSITION);
+			if(obj == null)
+				return;
+			JPanel editWindow= ((Association) obj).getEditWindow();
+			if(editWindow == null)
+				return;
+			editWindow.setVisible(false);
+			canvas.add(editWindow);
+			editWindow.setVisible(true);
+			editWindow.requestFocusInWindow();
+			canvas.setIsEditing(true);
+		} else if (SwingUtilities.isRightMouseButton(e)) {
+			Shape obj = canvas.getShapeAt(e.getPoint(),ShapeType.ASSOCIATON, ShapeType.AGGREGATION, ShapeType.COMPOSITION);
+			if (obj != null && obj.getPopupMenu() != null)
+				obj.getPopupMenu().show(canvas, e.getPoint().x, e.getPoint().y);
+		}
 	}
 	
 }

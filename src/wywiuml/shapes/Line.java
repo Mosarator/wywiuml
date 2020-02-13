@@ -41,7 +41,7 @@ public abstract class Line extends Shape {
 
 	@Override
 	public boolean isInside(Point p) {
-		return isInside(p, 2);
+		return isInside(p, 5);
 	}
 	
 	public boolean isInside(Point p, int tolerance) {

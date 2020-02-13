@@ -199,7 +199,7 @@ public class Generalization extends Line {
 	private static class PopupMenu extends JPopupMenu{
 		private PopupMenu(Generalization line){
 			
-			add(new JMenuItem(new AbstractAction("Löschen") {
+			add(new JMenuItem(new AbstractAction("L\u00f6schen") {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					line.delete(null);

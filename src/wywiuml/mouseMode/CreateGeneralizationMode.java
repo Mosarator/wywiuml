@@ -3,7 +3,11 @@ package wywiuml.mouseMode;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
 import wywiuml.gui.Canvas;
+import wywiuml.shapes.Association;
 import wywiuml.shapes.Generalization;
 import wywiuml.shapes.Shape;
 import wywiuml.shapes.Shape.ShapeType;
@@ -59,6 +63,16 @@ public class CreateGeneralizationMode extends MouseMode {
 		}
 		currentLine = null;
 		canvas.repaint();
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		Canvas canvas = Canvas.getInstance();
+		if (SwingUtilities.isRightMouseButton(e)) {
+			Shape obj = canvas.getShapeAt(e.getPoint(),ShapeType.GENERALIZATION, ShapeType.REALIZATION);
+			if (obj != null && obj.getPopupMenu() != null)
+				obj.getPopupMenu().show(canvas, e.getPoint().x, e.getPoint().y);
+		}
 	}
 
 }
