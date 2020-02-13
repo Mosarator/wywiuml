@@ -5,15 +5,23 @@ import java.awt.Component;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import wywiuml.mouseMode.CancelMode;
 import wywiuml.mouseMode.MouseMode;
@@ -63,7 +71,16 @@ public class Canvas extends JPanel {
 		super();
 		setLayout(null);
 		setBackground(BACKGROUND);
-		setMouseMode(lastMode);
+		// Cancel Editin when Escape-Key is pressed
+		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,0), "cancelEditing");
+		getActionMap().put("cancelEditing", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cancelEditing();
+			}
+		});
+		
+
 	}
 
 	@Override
@@ -118,8 +135,8 @@ public class Canvas extends JPanel {
 		if (isEditing) {
 			removeAll();
 			isEditing = false;
-			repaint();
 			setMouseMode(lastMode);
+			repaint();
 		}
 	}
 
@@ -135,8 +152,8 @@ public class Canvas extends JPanel {
 		return getShapeAt(p, null);
 	}
 
-	public Shape getShapeAt(Point p, ShapeType filter) {
-		if (filter == null) {
+	public Shape getShapeAt(Point p, ShapeType... filters) {
+		if (filters == null) {
 			for (Shape obj : shapes) {
 				// hidden objects should not be clickable
 				if(obj.isHidden())
@@ -149,8 +166,10 @@ public class Canvas extends JPanel {
 				// hidden objects should not be clickable
 				if(obj.isHidden())
 					continue;
-				if ((obj.getShapeType() == filter) && (obj.isInside(p)))
-					return obj;
+				for(ShapeType s : filters) {
+					if ((obj.getShapeType() == s) && (obj.isInside(p)))
+						return obj;
+				}
 			}
 		}
 		return null;

@@ -9,6 +9,8 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,17 +42,16 @@ public class ClassObject extends Shape {
 	private static final Color CLR_BG = Color.WHITE;
 	private static final Color CLR_TEXT = Color.BLACK;
 	private static final Color CLR_ERRORTEXT = Color.RED;
-	//private static final Color CLR_HIGHLIGHTED = Color.RED;
+	// private static final Color CLR_HIGHLIGHTED = Color.RED;
 
 	private ClassOrInterfaceUML umlInfo;
 	private boolean isInterface;
 	private boolean isAbstract;
 	private List<AnchorPoint> anchors = new ArrayList<AnchorPoint>();
-	
 
 	public static ClassObject fromUMLInfo(ClassOrInterfaceUML info) {
 		// TODO: fromCode
-		ClassObject obj = new ClassObject(0,0);
+		ClassObject obj = new ClassObject(0, 0);
 		obj.umlInfo = info;
 		obj.setInterface(info.isInterface());
 		obj.setAbstract(info.isAbstract());
@@ -99,7 +100,7 @@ public class ClassObject extends Shape {
 	public void removeAnchor(AnchorPoint a) {
 		anchors.remove(a);
 	}
-	
+
 	@Override
 	public void draw(Graphics g) {
 
@@ -129,14 +130,10 @@ public class ClassObject extends Shape {
 			return;
 
 		/**
-		 * if (isInterface && isAbstract) {
-			g.setColor(CLR_ERRORTEXT);
-		} else {
-			g.setColor(CLR_TEXT);
-		}
-		Interface CAN be abstract, but it's useless
-		**/
-		
+		 * if (isInterface && isAbstract) { g.setColor(CLR_ERRORTEXT); } else {
+		 * g.setColor(CLR_TEXT); } Interface CAN be abstract, but it's useless
+		 **/
+
 		g.setColor(CLR_TEXT);
 
 		if (isInterface) {
@@ -225,12 +222,12 @@ public class ClassObject extends Shape {
 	public ClassOrInterfaceUML getUMLInfo() {
 		return umlInfo;
 	}
-	
+
 	public void setUMLInfo(ClassOrInterfaceUML info) {
 		umlInfo = info;
 	}
-	
- 	private void setDefaultUmlInfo() {
+
+	private void setDefaultUmlInfo() {
 		int number = 0;
 		String className = null;
 		do {
@@ -241,7 +238,7 @@ public class ClassObject extends Shape {
 		} while (className == null);
 
 		this.umlInfo = ClassOrInterfaceUML.quickCreate("+" + className);
-		//this.isInterface = false;
+		// this.isInterface = false;
 	}
 
 	private void recalculateSize(FontMetrics metrics) {
@@ -330,19 +327,19 @@ public class ClassObject extends Shape {
 
 	@Override
 	public boolean readSaveState(Serializable saveState) {
-		
+
 		ClassSaveState ss = (ClassSaveState) saveState;
-		
+
 		pos.x = ss.posx;
 		pos.y = ss.posy;
 		dim.height = ss.height;
 		dim.width = ss.width;
 		setAbstract(ss.isAbstract);
 		setInterface(ss.isInterface);
-		//isAbstract = ss.isAbstract;
-		//isInterface = ss.isInterface;
+		// isAbstract = ss.isAbstract;
+		// isInterface = ss.isInterface;
 		ClassOrInterfaceUML newInfo;
-		
+
 		try {
 			newInfo = ClassOrInterfaceUML.quickCreate(ss.signature);
 			newInfo.uncompiledSignature = "";
@@ -378,16 +375,16 @@ public class ClassObject extends Shape {
 	@Override
 	public void delete(Shape source) {
 		// Deletion starts from here
-		if(source == null) {
+		if (source == null) {
 			Canvas.getInstance().removeShape(this);
 			ClassOrInterfaceUML.removeFromList(umlInfo);
-			for(AnchorPoint a : anchors) {
+			for (AnchorPoint a : anchors) {
 				a.delete(this);
 			}
 		}
 		super.delete(source);
 	}
-	
+
 	@SuppressWarnings("serial")
 	private static class PopupMenu extends JPopupMenu {
 		// Constructor
@@ -419,7 +416,7 @@ public class ClassObject extends Shape {
 				}
 			}) {
 			});
-			
+
 			add(new JMenuItem(new AbstractAction("L\u00f6schen") {
 				public void actionPerformed(ActionEvent e) {
 					umlclass.delete(null);
@@ -434,8 +431,7 @@ public class ClassObject extends Shape {
 				}
 			}) {
 			});
-			
-			
+
 		}
 
 	}
@@ -453,6 +449,7 @@ public class ClassObject extends Shape {
 
 		private EditWindow(ClassObject obj) {
 			super();
+
 			// "Konstanten"
 			Color bg = Color.BLACK;
 			List<String> attributes = new ArrayList<String>();
@@ -506,7 +503,7 @@ public class ClassObject extends Shape {
 				public void actionPerformed(ActionEvent e) {
 					ClassOrInterfaceUML newInfo = null;
 					try {
-						//obj.uncompiledSignature = "";
+						// obj.uncompiledSignature = "";
 						newInfo = ClassOrInterfaceUML.quickCreate(nameField.getText());
 						newInfo.uncompiledSignature = "";
 					} catch (Exception error) {
@@ -515,7 +512,7 @@ public class ClassObject extends Shape {
 					}
 					newInfo.setIsAbstract(obj.isAbstract);
 					newInfo.setIsInterface(obj.isInterface);
-					//List<String> uncompiledAttributes = new ArrayList<String>();
+					// List<String> uncompiledAttributes = new ArrayList<String>();
 					String[] lines = attArea.getText().split("\r?\n");
 					for (String line : lines) {
 						try {
@@ -526,7 +523,7 @@ public class ClassObject extends Shape {
 						}
 					}
 
-					//List<String> uncompiledMethods = new ArrayList<String>();
+					// List<String> uncompiledMethods = new ArrayList<String>();
 					lines = methArea.getText().split("\r?\n");
 					for (String line : lines) {
 						try {
@@ -539,9 +536,9 @@ public class ClassObject extends Shape {
 					}
 					ClassOrInterfaceUML.removeFromList(obj.umlInfo);
 					obj.umlInfo = newInfo;
-					//obj.uncompiledAttributes = uncompiledAttributes;
-					//obj.uncompiledMethods = uncompiledMethods;
-					//Canvas.getInstance().remove(outerPanel);
+					// obj.uncompiledAttributes = uncompiledAttributes;
+					// obj.uncompiledMethods = uncompiledMethods;
+					// Canvas.getInstance().remove(outerPanel);
 					Canvas.getInstance().cancelEditing();
 					obj.update();
 					Canvas.getInstance().repaint();
@@ -565,6 +562,7 @@ public class ClassObject extends Shape {
 					obj.dim.height + buttPanel.getPreferredSize().height);
 
 			setVisible(true);
+
 		}
 
 	}

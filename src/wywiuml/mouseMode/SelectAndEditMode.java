@@ -3,7 +3,6 @@ package wywiuml.mouseMode;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -11,7 +10,6 @@ import wywiuml.gui.Canvas;
 import wywiuml.shapes.AnchorPoint;
 import wywiuml.shapes.Association;
 import wywiuml.shapes.ClassObject;
-import wywiuml.shapes.Generalization;
 import wywiuml.shapes.Shape;
 import wywiuml.shapes.Shape.ShapeType;
 
@@ -95,6 +93,7 @@ public class SelectAndEditMode extends MouseMode {
 			editWindow.setVisible(false);
 			canvas.add(editWindow);
 			editWindow.setVisible(true);
+			editWindow.requestFocusInWindow();
 			canvas.setIsEditing(true);
 			
 		} else if (SwingUtilities.isLeftMouseButton(e)) {
