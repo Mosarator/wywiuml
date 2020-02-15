@@ -33,12 +33,16 @@ public class Association extends Line {
 	private final static String visibilityCharacters = "[+#~-]";
 	private final static String namingRegEx = ""+ firstCharacters + followingCharacters + "*";
 	final static String nameRegex = "^(" + visibilityCharacters + "?)" + "\\s*(" + namingRegEx + ")\\s*$";
+	final static String multiRegex = "^\\s*([\\*|\\d*])(?>(\\.{3})([\\*|\\d*]))?\\s*$";
 	
 	private static ShapeType currentDefault = ShapeType.ASSOCIATON;
 	private boolean isCompleted;
 	private boolean isCorrect;
 	private String variable = "+ variable";
-
+	// Kardinalitaeten
+	private String multiFrom = "*";
+	private String multiTo = "*";
+	
 	public Association() {
 		this(false);
 	}
@@ -57,7 +61,24 @@ public class Association extends Line {
 		}
 	}
 
-	public String getVariable() {
+	public void setMultiplicitys(String input1, String input2) {
+		Pattern pattern = Pattern.compile(multiRegex);
+		Matcher matcher1 = pattern.matcher(input1);
+		Matcher matcher2 = pattern.matcher(input2);
+		
+		
+		if(matcher1.find() && matcher2.find()) {
+			isCorrect = true;
+			multiFrom = input1.trim();
+			multiTo = input2.trim();
+		} else {
+			isCorrect = false;
+			multiFrom = input1;
+			multiTo = input2;
+		}
+	}
+	
+ 	public String getVariable() {
 		return variable;
 	}
 	
@@ -70,7 +91,7 @@ public class Association extends Line {
 		if(matcher.find()) {
 			isCorrect = true;
 			if(matcher.group(1).isEmpty())
-				str.append("#");
+				str.append("~");
 			else
 				str.append(matcher.group(1));
 			str.append(" ");
@@ -126,16 +147,29 @@ public class Association extends Line {
 			drawLinePath(g);
 			// Draw VariableText
 			// Draw it on last segment
-			LineSegment lastSegment = segments.get(segments.size() - 1);
-			lastSegment.getStartAnchor();
-			int xpos = (lastSegment.getStartAnchor().getX() + lastSegment.getEndAnchor().getX()) / 2;
-			int ypos = (lastSegment.getStartAnchor().getY() + lastSegment.getEndAnchor().getY()) / 2;
-			FontMetrics metrics = g.getFontMetrics();
-
-			g.drawString(variable, xpos - metrics.stringWidth(variable) / 2, ypos - 5);
+			LineSegment fs = segments.get(0);
+			LineSegment ls = segments.get(segments.size() - 1);
+			int xpos = (ls.getStartAnchor().getX() + ls.getEndAnchor().getX()) / 2;
+			int ypos = (ls.getStartAnchor().getY() + ls.getEndAnchor().getY()) / 2;
+			
+			//FontMetrics metrics = g.getFontMetrics();
+			//g.drawString(variable, xpos - metrics.stringWidth(variable) / 2, ypos - 5);
+			// not centering the Text at the position leads to better results
+			g.drawString(variable, xpos, ypos - 5);
+			
+			// cardiFrom
+			xpos = (int)(fs.getStartAnchor().getX()*0.9f + fs.getEndAnchor().getX()*0.1f);
+			ypos = (int)(fs.getStartAnchor().getY()*0.9f + fs.getEndAnchor().getY()*0.1f);
+			g.drawString(multiFrom, xpos, ypos);
+			
+			// cardiTo
+			xpos = (int)(ls.getStartAnchor().getX()*0.1f + ls.getEndAnchor().getX()*0.9f);
+			ypos = (int)(ls.getStartAnchor().getY()*0.1f + ls.getEndAnchor().getY()*0.9f);
+			g.drawString(multiTo, xpos, ypos);
+			
 		}
 		
-		// dont bother drawing the arrowhead if line is
+		// don't bother drawing the arrowhead if line is
 		// not completed and very short
 		if(!isCompleted && startP.distance(endP)<10) {
 			return;
@@ -186,7 +220,6 @@ public class Association extends Line {
 
 	@Override
 	public boolean isInside(Point p) {
-		boolean result = super.isInside(p);
 
 		// Check if inside variable text.
 		Rectangle rect = new Rectangle();
@@ -196,12 +229,12 @@ public class Association extends Line {
 		int ypos = (lastSegment.getStartAnchor().getY() + lastSegment.getEndAnchor().getY()) / 2;
 		FontMetrics metrics = Canvas.getInstance().getFontMetrics(BASICFONT);
 
-		rect.x = xpos - metrics.stringWidth(variable) / 2;
+		rect.x = xpos;
 		rect.y = ypos - metrics.getHeight() - 5;
 		rect.width = metrics.stringWidth(variable);
 		rect.height = metrics.getHeight();
 
-		return (result || rect.contains(p));
+		return (super.isInside(p) || rect.contains(p));
 	}
 
 	@Override
@@ -242,6 +275,7 @@ public class Association extends Line {
 				Canvas.getInstance().getShapeAt(endP, ShapeType.CLASS));
 		shapetype = state.type;
 		setVariable(state.variable);
+		setMultiplicitys(state.multiFrom, state.multiTo);
 		return true;
 	}
 
@@ -252,10 +286,14 @@ public class Association extends Line {
 		int endX;
 		int endY;
 		String variable;
+		String multiFrom;
+		String multiTo;
 
 		private AssociationSaveState(Association obj) {
 			type = obj.shapetype;
 			variable = obj.getVariable();
+			multiFrom = obj.multiFrom;
+			multiTo = obj.multiTo;
 			if (obj.startPoint != null && obj.endPoint != null) {
 				startX = obj.startPoint.getX();
 				startY = obj.startPoint.getY();
@@ -274,20 +312,26 @@ public class Association extends Line {
 	@SuppressWarnings("serial")
 	private static class EditWindow extends JPanel {
 		private JTextField attField;
+		private JTextField fromField;
+		private JTextField toField;
 		private JButton acceptButt;
 		private JButton cancelButt;
 		private JPanel buttPanel;
 
 		private EditWindow(Association line) {
 			super();
+			Canvas canvas = Canvas.getInstance();
 			setLayout(new GridLayout(2, 1));
 			attField = new JTextField(line.variable);
-
+			fromField = new JTextField(line.multiFrom);
+			toField = new JTextField(line.multiTo);
+			
 			acceptButt = new JButton("OK");
 			acceptButt.addActionListener(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					line.setVariable(attField.getText());
+					line.setMultiplicitys(fromField.getText(), toField.getText());
 					Canvas.getInstance().cancelEditing();
 					Canvas.getInstance().repaint();
 				}
@@ -313,20 +357,33 @@ public class Association extends Line {
 			add(buttPanel);
 
 			Rectangle rect = new Rectangle();
-			LineSegment lastSegment = line.segments.get(line.segments.size() - 1);
-			lastSegment.getStartAnchor();
-			int xpos = (lastSegment.getStartAnchor().getX() + lastSegment.getEndAnchor().getX()) / 2;
-			int ypos = (lastSegment.getStartAnchor().getY() + lastSegment.getEndAnchor().getY()) / 2;
-			FontMetrics metrics = Canvas.getInstance().getFontMetrics(BASICFONT);
+			LineSegment fs = line.segments.get(0);
+			LineSegment ls = line.segments.get(line.segments.size() - 1);
+			int xpos = (ls.getStartAnchor().getX() + ls.getEndAnchor().getX()) / 2;
+			int ypos = (ls.getStartAnchor().getY() + ls.getEndAnchor().getY()) / 2;
+			FontMetrics metrics = canvas.getFontMetrics(BASICFONT);
 
-			rect.x = xpos - metrics.stringWidth(line.variable) / 2;
-			rect.y = ypos - metrics.getHeight() - 5;
+			rect.x = xpos;
+			rect.y = ypos;
 			rect.width = metrics.stringWidth(line.variable);
 			rect.height = metrics.getHeight();
 
 			setBounds(rect.x, rect.y, Math.max(rect.width, buttPanel.getPreferredSize().width),
 					rect.height + buttPanel.getPreferredSize().height);
-
+			
+			// Make the Multiplicitys free floating
+			canvas.add(fromField);
+			xpos = (int)(fs.getStartAnchor().getX()*0.9f + fs.getEndAnchor().getX()*0.1f);
+			ypos = (int)(fs.getStartAnchor().getY()*0.9f + fs.getEndAnchor().getY()*0.1f);
+			fromField.setBounds(xpos, ypos, 50, metrics.getHeight());
+			
+			
+			// cardiTo
+			canvas.add(toField);
+			xpos = (int)(ls.getStartAnchor().getX()*0.1f + ls.getEndAnchor().getX()*0.9f);
+			ypos = (int)(ls.getStartAnchor().getY()*0.1f + ls.getEndAnchor().getY()*0.9f);
+			toField.setBounds(xpos, ypos, 50, metrics.getHeight());
+			
 			setVisible(true);
 		}
 	}

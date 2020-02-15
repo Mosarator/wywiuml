@@ -74,7 +74,6 @@ public abstract class Shape {
 		this.isHidden = isHidden;
 	}
 
-
 	@SuppressWarnings("serial")
 	public static class SaveState implements Serializable{
 		public ShapeType type;

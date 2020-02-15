@@ -30,6 +30,7 @@ import wywiuml.shapes.Line;
 import wywiuml.shapes.Shape;
 import wywiuml.shapes.Shape.ShapeType;
 import wywiuml.structures.ClassOrInterfaceUML;
+import wywiuml.structures.ClassOrInterfaceUML.DuplicateException;
 
 @SuppressWarnings("serial")
 public class Menubar extends JMenuBar {
@@ -241,8 +242,11 @@ public class Menubar extends JMenuBar {
 							Association a = (Association) s;
 							from = (ClassObject) (a.startPoint.getConnectedShape());
 							to = (ClassObject) (a.endPoint.getConnectedShape());
-							from.getUMLInfo()
+							try{from.getUMLInfo()
 									.addAttributeFromUMLString(a.getVariable() + ":" + to.getUMLInfo().getName());
+							}catch(DuplicateException ex) {
+								JOptionPane.showMessageDialog(null, a.getVariable() + " bereits vergeben. Duplikat beim Speichern verworfen!");
+							}
 							break;
 						default:
 							break;

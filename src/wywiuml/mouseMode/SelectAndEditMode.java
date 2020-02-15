@@ -70,6 +70,7 @@ public class SelectAndEditMode extends MouseMode {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		super.mouseClicked(e);
 		Canvas canvas = Canvas.getInstance();
 		if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
 			System.out.println("Double Click!");

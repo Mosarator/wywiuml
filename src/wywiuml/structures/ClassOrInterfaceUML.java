@@ -67,10 +67,10 @@ public class ClassOrInterfaceUML {
 					case '+':
 						info.classInfo.addModifier(Modifier.Keyword.PUBLIC);
 						break;
-					case '#':
+					case '~':
 						// "Package Modifier" doesn't exist
 						break;
-					case '~':
+					case '#':
 						info.classInfo.addModifier(Modifier.Keyword.PROTECTED);
 						break;
 					case '-':
@@ -207,16 +207,16 @@ public class ClassOrInterfaceUML {
 						str.append("-");
 						break;
 					case PROTECTED:
-						str.append("~");
+						str.append("#");
 						break;
 					case PACKAGE_PRIVATE:
-						str.append("#");
+						str.append("~");
 						break;
 					case PUBLIC:
 						str.append("+");
 						break;
 					default:
-						str.append("#");
+						str.append("~");
 				}
 				str.append(vd.getNameAsString());
 				str.append(" : ");
@@ -245,16 +245,16 @@ public class ClassOrInterfaceUML {
 					str.append("-");
 					break;
 				case PROTECTED:
-					str.append("~");
+					str.append("#");
 					break;
 				case PACKAGE_PRIVATE:
-					str.append("#");
+					str.append("~");
 					break;
 				case PUBLIC:
 					str.append("+");
 					break;
 				default:
-					str.append("#");
+					str.append("~");
 			}
 			str.append(md.getNameAsString());
 			str.append("(");
@@ -294,16 +294,16 @@ public class ClassOrInterfaceUML {
 					str.append("-");
 					break;
 				case PROTECTED:
-					str.append("~");
+					str.append("#");
 					break;
 				case PACKAGE_PRIVATE:
-					str.append("#");
+					str.append("~");
 					break;
 				case PUBLIC:
 					str.append("+");
 					break;
 				default:
-					str.append("#");
+					str.append("~");
 			}
 			str.append(cd.getNameAsString());
 			str.append("(");
@@ -340,16 +340,16 @@ public class ClassOrInterfaceUML {
 				str.append("-");
 				break;
 			case PROTECTED:
-				str.append("~");
+				str.append("#");
 				break;
 			case PACKAGE_PRIVATE:
-				str.append("#");
+				str.append("~");
 				break;
 			case PUBLIC:
 				str.append("+");
 				break;
 			default:
-				str.append("#");
+				str.append("~");
 		}
 		str.append(classInfo.getNameAsString());
 		return str.toString();
@@ -379,10 +379,10 @@ public class ClassOrInterfaceUML {
 					case "+":
 						keyword = (Modifier.Keyword.PUBLIC);
 						break;
-					case "#":
+					case "~":
 						// PACKAGE visibility has no modifier
 						break;
-					case "~":
+					case "#":
 						keyword = (Modifier.Keyword.PROTECTED);
 						break;
 					case "-":
@@ -438,10 +438,10 @@ public class ClassOrInterfaceUML {
 					case "+":
 						keyword = Modifier.Keyword.PUBLIC;
 						break;
-					case "#":
+					case "~":
 						// PACKAGE visibility has no modifier
 						break;
-					case "~":
+					case "#":
 						keyword = Modifier.Keyword.PROTECTED;
 						break;
 					case "-":
@@ -493,10 +493,10 @@ public class ClassOrInterfaceUML {
 				case "+":
 					keyword = Modifier.Keyword.PUBLIC;
 					break;
-				case "#":
+				case "~":
 					// PACKAGE visibility has no modifier
 					break;
-				case "~":
+				case "#":
 					keyword = Modifier.Keyword.PROTECTED;
 					break;
 				case "-":
