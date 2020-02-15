@@ -23,7 +23,6 @@ public class CreateGeneralizationMode extends MouseMode {
 		canvas = Canvas.getInstance();
 		modeName = "CreateGeneralizationMode";
 		description = "Verebung/Implementierung";
-
 	}
 
 	@Override
@@ -67,12 +66,7 @@ public class CreateGeneralizationMode extends MouseMode {
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		Canvas canvas = Canvas.getInstance();
-		if (SwingUtilities.isRightMouseButton(e)) {
-			Shape obj = canvas.getShapeAt(e.getPoint(),ShapeType.GENERALIZATION, ShapeType.REALIZATION);
-			if (obj != null && obj.getPopupMenu() != null)
-				obj.getPopupMenu().show(canvas, e.getPoint().x, e.getPoint().y);
-		}
+		super.mouseClicked(e);
 	}
 
 }

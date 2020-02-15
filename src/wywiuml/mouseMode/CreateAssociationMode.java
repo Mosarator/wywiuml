@@ -37,7 +37,7 @@ public class CreateAssociationMode extends MouseMode {
 		if (obj == null)
 			return;
 		lastPos = startP;
-		currentLine = new Association(false, startP, startP);
+		currentLine = new Association(false, startP, lastPos);
 		canvas.addShape(currentLine);
 	}
 	
@@ -68,6 +68,7 @@ public class CreateAssociationMode extends MouseMode {
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		super.mouseClicked(e);
 		Canvas canvas = Canvas.getInstance();
 		if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
 			Shape obj = canvas.getShapeAt(e.getPoint(), ShapeType.ASSOCIATON, ShapeType.AGGREGATION, ShapeType.COMPOSITION);
@@ -81,10 +82,6 @@ public class CreateAssociationMode extends MouseMode {
 			editWindow.setVisible(true);
 			editWindow.requestFocusInWindow();
 			canvas.setIsEditing(true);
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			Shape obj = canvas.getShapeAt(e.getPoint(),ShapeType.ASSOCIATON, ShapeType.AGGREGATION, ShapeType.COMPOSITION);
-			if (obj != null && obj.getPopupMenu() != null)
-				obj.getPopupMenu().show(canvas, e.getPoint().x, e.getPoint().y);
 		}
 	}
 	

@@ -28,6 +28,7 @@ public class CreateClassMode extends MouseMode {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		super.mouseClicked(e);
 		Canvas canvas = Canvas.getInstance();
 		if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
 			Shape obj = canvas.getShapeAt(e.getPoint(),ShapeType.CLASS);
@@ -47,10 +48,6 @@ public class CreateClassMode extends MouseMode {
 			ClassObject tmp = new ClassObject(e.getX(), e.getY());
 			canvas.addShape(tmp);
 			canvas.repaint();
-		}else if (SwingUtilities.isRightMouseButton(e)) {
-			Shape obj = canvas.getShapeAt(e.getPoint(),ShapeType.CLASS);
-			if (obj != null && obj.getPopupMenu() != null)
-				obj.getPopupMenu().show(canvas, e.getPoint().x, e.getPoint().y);
 		}
 	}
 

@@ -28,8 +28,7 @@ public class CancelMode extends MouseMode{
 	public void mouseClicked(MouseEvent e) {
 		Canvas canvas = Canvas.getInstance();
 		canvas.cancelEditing();
-		toolbar.resetMode();
-		canvas.repaint();
+		super.mouseClicked(e);
 	}
 
 }

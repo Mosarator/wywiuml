@@ -64,8 +64,6 @@ public class SelectAndEditMode extends MouseMode {
 				}
 				lastP = e.getPoint();
 			}
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-
 		}
 		Canvas.getInstance().repaint();
 	}
@@ -96,12 +94,6 @@ public class SelectAndEditMode extends MouseMode {
 			editWindow.requestFocusInWindow();
 			canvas.setIsEditing(true);
 			
-		} else if (SwingUtilities.isLeftMouseButton(e)) {
-
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			Shape obj = canvas.getShapeAt(e.getPoint());
-			if (obj != null && obj.getPopupMenu() != null)
-				obj.getPopupMenu().show(canvas, e.getPoint().x, e.getPoint().y);
 		}
 		Canvas.getInstance().repaint();
 	}

@@ -134,6 +134,13 @@ public class Association extends Line {
 
 			g.drawString(variable, xpos - metrics.stringWidth(variable) / 2, ypos - 5);
 		}
+		
+		// dont bother drawing the arrowhead if line is
+		// not completed and very short
+		if(!isCompleted && startP.distance(endP)<10) {
+			return;
+		}
+		
 		// Draw ArrowHead
 		// Senkrechte bestimmen:
 		int dx = endP.x - startP.x;
