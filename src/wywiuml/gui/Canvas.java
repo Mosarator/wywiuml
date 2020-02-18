@@ -181,6 +181,7 @@ public class Canvas extends JPanel {
 
 	public void readSaveState(Serializable state) {
 		CanvasSaveState cs;
+		System.out.println("canvas.readsavestate");
 		try {
 			cs = (CanvasSaveState) state;
 		} catch (Exception error) {
@@ -189,7 +190,7 @@ public class Canvas extends JPanel {
 		}
 		shapes.clear();
 		SaveState s = null;
-		for (int i = cs.shapesStates.length - 1; i >= 0; i--) {
+		for (int i = 0; i < cs.shapesStates.length; i++) {
 			s = cs.shapesStates[i];
 			switch (s.type) {
 				case CLASS:
