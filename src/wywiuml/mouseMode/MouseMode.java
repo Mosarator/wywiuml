@@ -2,15 +2,12 @@ package wywiuml.mouseMode;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.Serializable;
 
 import javax.swing.SwingUtilities;
 
 import wywiuml.gui.Canvas;
 import wywiuml.shapes.Shape;
-import wywiuml.shapes.Shape.ShapeType;
 
-@SuppressWarnings("serial")
 public abstract class MouseMode extends MouseAdapter {
 
 	protected String modeName;

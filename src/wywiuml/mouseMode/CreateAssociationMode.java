@@ -8,8 +8,6 @@ import javax.swing.SwingUtilities;
 
 import wywiuml.gui.Canvas;
 import wywiuml.shapes.Association;
-import wywiuml.shapes.ClassObject;
-import wywiuml.shapes.Generalization;
 import wywiuml.shapes.Shape;
 import wywiuml.shapes.Shape.ShapeType;
 

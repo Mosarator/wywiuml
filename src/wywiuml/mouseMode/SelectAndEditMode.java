@@ -16,7 +16,7 @@ import wywiuml.shapes.Shape.ShapeType;
 public class SelectAndEditMode extends MouseMode {
 	private static SelectAndEditMode instance;
 	private Shape selectedShape;
-	private Point startP;
+//	private Point startP;
 	private Point lastP;
 
 	public static SelectAndEditMode getInstance() {
@@ -34,7 +34,7 @@ public class SelectAndEditMode extends MouseMode {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			startP = e.getPoint();
+//			startP = e.getPoint();
 			lastP = e.getPoint();
 			selectedShape = Canvas.getInstance().getShapeAt(e.getPoint());
 			Canvas.getInstance().selected = selectedShape;

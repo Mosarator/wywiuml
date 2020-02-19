@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;

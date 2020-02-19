@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import wywiuml.gui.Canvas;
-import wywiuml.shapes.Line.LineSegment;
-import wywiuml.shapes.Shape.ShapeType;
 
 public abstract class Line extends Shape {
 

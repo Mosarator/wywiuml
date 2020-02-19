@@ -26,7 +26,6 @@ import wywiuml.parsing.Parser;
 import wywiuml.shapes.Association;
 import wywiuml.shapes.ClassObject;
 import wywiuml.shapes.Generalization;
-import wywiuml.shapes.Line;
 import wywiuml.shapes.Shape;
 import wywiuml.shapes.Shape.ShapeType;
 import wywiuml.structures.ClassOrInterfaceUML;

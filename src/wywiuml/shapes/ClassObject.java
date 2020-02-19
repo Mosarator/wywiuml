@@ -9,8 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -458,7 +456,7 @@ public class ClassObject extends Shape {
 			List<String> methods = new ArrayList<String>();
 			methods.addAll(obj.umlInfo.getMethodsInUML());
 			methods.addAll(obj.umlInfo.uncompiledMethods);
-			JPanel outerPanel = this;
+//			JPanel outerPanel = this;
 			StringBuilder str = new StringBuilder("");
 
 			setBackground(bg);

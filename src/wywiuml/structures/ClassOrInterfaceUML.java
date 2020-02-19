@@ -356,8 +356,6 @@ public class ClassOrInterfaceUML {
 	}
 
 	public void addAttributeFromUMLString(String inputString) throws RegExException, DuplicateException {
-		Modifier mod = new Modifier();
-
 		Pattern pattern = Pattern.compile(attributeRegex);
 		Matcher matcher = pattern.matcher(inputString);
 
@@ -407,8 +405,7 @@ public class ClassOrInterfaceUML {
 	}
 
 	public void addMethodFromUMLString(String inputString) throws RegExException {
-		Modifier mod = new Modifier();
-
+		
 		Pattern pattern = Pattern.compile(methodRegex);
 		Matcher matcher = pattern.matcher(inputString);
 
