@@ -56,12 +56,6 @@ public class Canvas extends JPanel {
 			getInstance();
 	}
 
-	public BufferedImage createImage() {
-		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-		paint(img.createGraphics());
-		return img;
-	}
-
 	private Canvas() {
 		super();
 		setLayout(null);
@@ -74,8 +68,20 @@ public class Canvas extends JPanel {
 				cancelEditing();
 			}
 		});
-		
+	}
 
+	public BufferedImage createImage() {
+		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+		Graphics g = img.createGraphics();
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, getSize().width, getSize().height);
+
+		for (int i = shapes.size()-1; i >= 0; i--) {
+			if (shapes.get(i).isHidden() == false)
+				shapes.get(i).draw(g);
+		}
+		//paint(g);
+		return img;
 	}
 
 	@Override
@@ -97,6 +103,7 @@ public class Canvas extends JPanel {
 		// Highlight current Mode in upperleft corner
 		highlightMode(g);
 	}
+	
 
 	public Shape addShape(Shape obj) {
 		shapes.add(obj);
@@ -192,6 +199,7 @@ public class Canvas extends JPanel {
 					ClassObject umlclass = new ClassObject();
 					umlclass.readSaveState(s);
 					addShape(umlclass);
+					umlclass.update();
 					break;
 				case GENERALIZATION:
 				case REALIZATION:

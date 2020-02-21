@@ -27,7 +27,7 @@ public class Editor extends JFrame{
 	
 	public static void main(String[] args) {
 		Editor editor = new Editor();
-		editor.setTitle("UML-Editor");
+		editor.setTitle("WYSIWYG-UML-Editor");
 		editor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		editor.setSize(1200, 700);
 		editor.setLocationRelativeTo(null);

@@ -37,11 +37,11 @@ public class Menubar extends JMenuBar {
 	private String lastPath = "";
 
 	public Menubar() {
-		JMenu menu = new JMenu("Datei");
-		add(menu);
+		JMenu menuFiles = new JMenu("Datei");
+		add(menuFiles);
 
 		JMenuItem importMenu = new JMenu("Importieren...");
-		menu.add(importMenu);
+		menuFiles.add(importMenu);
 
 		JMenuItem importFromCode = new JMenuItem(new AbstractAction("... aus Java Klasse") {
 			@Override
@@ -169,7 +169,7 @@ public class Menubar extends JMenuBar {
 		importMenu.add(importFromPath);
 
 		JMenuItem export = new JMenu("Exportieren...");
-		menu.add(export);
+		menuFiles.add(export);
 
 		JMenuItem exportImg = new JMenuItem(new AbstractAction("...als JPG") {
 			@Override
@@ -186,8 +186,11 @@ public class Menubar extends JMenuBar {
 					case JFileChooser.APPROVE_OPTION:
 						try {
 							lastPath = chooser.getSelectedFile().getParent();
-							File outputfile = new File(chooser.getSelectedFile() + ".png");
-							ImageIO.write(Canvas.getInstance().createImage(), "png", outputfile);
+							File file = chooser.getSelectedFile();
+							if (file.getAbsolutePath().endsWith(".png") == false) {
+								file = new File(chooser.getSelectedFile() + ".png");
+							}
+							ImageIO.write(Canvas.getInstance().createImage(), "png", file);
 						} catch (Exception error) {
 						}
 						break;
@@ -319,7 +322,7 @@ public class Menubar extends JMenuBar {
 				}
 			}
 		});
-		menu.add(saveAsUML);
+		menuFiles.add(saveAsUML);
 
 		JMenuItem loadUML = new JMenuItem(new AbstractAction("Laden von UML") {
 			@Override
@@ -345,8 +348,22 @@ public class Menubar extends JMenuBar {
 				}
 			}
 		});
-		menu.add(loadUML);
+		menuFiles.add(loadUML);
 
+		JMenu menuEdit = new JMenu("Bearbeiten");
+		add(menuEdit);
+		
+		JMenuItem clearCanvas = new JMenuItem(new AbstractAction("Diagramm leeren") {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Canvas canvas = Canvas.getInstance();
+				canvas.clean();
+			}
+		});
+		menuEdit.add(clearCanvas);
+		
 	}
 
 }
