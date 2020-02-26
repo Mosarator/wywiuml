@@ -360,6 +360,7 @@ public class Menubar extends JMenuBar {
 				// TODO Auto-generated method stub
 				Canvas canvas = Canvas.getInstance();
 				canvas.clean();
+				canvas.repaint();
 			}
 		});
 		menuEdit.add(clearCanvas);
